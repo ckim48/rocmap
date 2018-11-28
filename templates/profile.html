@@ -1,0 +1,884 @@
+
+
+<!-- Modified by Seungho on 2017/11/15 11:44 AM -->
+<!-- Added Core.html and Flask template implementations and fixed .js and .css errors -->
+<!-- Modified by JING SUN on 2017/11/18 11:14 AM -->
+
+{% extends "core.html" %}
+{% block title %}Profile{% endblock %}
+{% block body %}
+
+<style>
+.card {
+  width: 100%;
+  position: relative;
+  left: 50%;
+  margin-top: 20px;
+  padding: 0px;
+  background-color: rgba(214, 224, 226, 0.2);
+  -webkit-border-top-left-radius:5px;
+  -moz-border-top-left-radius:5px;
+  border-top-left-radius:5px;
+  -webkit-border-top-right-radius:5px;
+  -moz-border-top-right-radius:5px;
+  border-top-right-radius:5px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.card.hovercard {
+  position: relative;
+  padding-top: 0;
+  overflow: hidden;
+  text-align: center;
+  background-color: #fff;
+  background-color: rgba(255, 255, 255, 1);
+}
+.card.hovercard .card-background {
+  height: 180px;
+}
+.card-background img {
+  -webkit-filter: blur(25px);
+  -moz-filter: blur(25px);
+  -o-filter: blur(25px);
+  -ms-filter: blur(25px);
+  filter: blur(25px);
+  margin-left: -100px;
+  margin-top: -200px;
+  min-width: 130%;
+}
+.card.hovercard .useravatar {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+}
+.card.hovercard .useravatar img {
+  width: 100px;
+  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.5);
+}
+.card.hovercard .card-info  {
+  position: absolute;
+  bottom: 34px;
+  left: 0;
+  right: 0;
+}
+.card.hovercard .card-info .card-title {
+  padding:0 10px;
+  font-size: 20px;
+  line-height: 1;
+  color: #262626;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.card.hovercard .card-info-bio  {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+}
+
+#card-Edit  {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.edit-icon {
+  color:gray;
+  font-size:20px;
+}
+
+.edit-icon:hover {
+  color:black;
+}
+
+.card.hovercard .card-info .card-title-bio {
+  padding:0 10px;
+  font-size: 20px;
+  line-height: 1;
+  color: #262626;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.card.hovercard .card-info {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 20px;
+  color: #737373;
+  text-overflow: ellipsis;
+}
+.card.hovercard .bottom {
+  padding: 0 20px;
+  margin-bottom: 17px;
+}
+.courses {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  left: 50%;
+  margin-top: 6px;
+  margin-bottom: 0;
+  padding: 10px 10px 10px 20px;
+  background-color: #F7F9F9;
+}
+.card-course {
+  width: 100%;
+  position: relative;
+  left: 50%;
+  margin-top: 0;
+  padding: 3px 0 0 0;
+  border-radius: 5px;
+}
+.course-title {
+  float: left;
+  color: #262626;
+}
+.add-icon {
+  padding: 0 10px 0 0;
+  float: right;
+}
+.remove-icon {
+  float: right;
+}
+a:hover {
+  color: #651296;
+  text-decoration: none;
+}
+
+/* Set a style for all buttons */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+  padding: 14px 20px;
+  background-color: #f44336;
+}
+
+/* Float cancel and signup buttons and add an equal width */
+.cancelbtn,.addbtn {float:left;width:50%}
+
+/* Add padding to container elements */
+.container {
+  padding: 20px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button (x) */
+.close {
+  position: absolute;
+  right: 35px;
+  top: 15px;
+  color: #000;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: red;
+  cursor: pointer;
+}
+
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+  .cancelbtn, .addbtn {
+    width: 100%;
+  }
+}
+  #background {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   z-index: -100;
+   background-color: #51595B;
+   opacity: 1;
+}
+</style>
+<div id="background"></div>
+<div class="col-lg-6 col-sm-6">
+  <div class="card hovercard">
+    <div class="card-background">
+      <img class="card-bkimg" src="{{ url_for('static', filename= 'profile_pic/' + user_image)}}" >
+    </div>
+    <div class="useravatar">
+      <img src="{{ url_for('static', filename= 'profile_pic/' + user_image)}}">
+    </div>
+    
+    <div class="card-info"> <span class="card-title">{{ user_name }}</span>
+    </div>
+
+    <!--<div id="card-Edit" onclick="document.getElementById('Edit-prof').style.display='block'"> <span class= "btn btn-outline-info">Change Your Info!</span>
+    </div>-->
+
+    <!--test by Shaoyi Huang-->
+    <div id="card-Edit" onclick="document.getElementById('Edit-prof').style.display='block'"> <span><i class="material-icons edit-icon">mode_edit</i></span>
+    </div>
+    <!--test by Shaoyi Huang-->
+
+    <div class="card-info-bio"> <span class="card-title-bio"><i>{{user_bio}}</i></span>
+    </div>
+    
+  </div>
+</div>
+
+<div class="col-lg-6 col-sm-6">
+  <div id="accordion" role="tablist">
+    <div class="courses">
+      <h5 class="mb-0">
+        <span class="course-title">Courses</span>
+        <div class="add-icon">
+          <i class="material-icons" onclick="document.getElementById('id01').style.display='block'">add_circle</i>
+        </div>
+      </h5>
+    </div>
+    <div id="show-all-course"></div>
+  </div>
+</div>
+
+
+
+<div id="id01" class="modal">
+  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">×</span>
+  <form class="modal-content animate">
+    <div class="container">
+      <div class="form-group">
+        <label for="exampleFormControlSelect1">School</label>
+        <select class="form-control" id="exampleFormControlSelect1">
+          <option>Arts, Science, and Engineering</option>
+          <option>Estman School of Music</option>
+          <option>School of Medicine & Dentistry</option>
+          <option>School of Nursing</option>
+          <option>Simon School of Business Administration</option>
+          <option>Warner School of Education</option>
+          <option>Eastman Institute for Oral Health</option>
+	</select>
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlSelect1">Department</label>
+        <select class="form-control" id="dpt_list">
+          <!--<option>African and African American Studies Program</option>
+          <option>American Sign Language Program</option>
+          <option>American Studies Program</option>
+          <option>Anthropology, Department of</option>
+          <option>Archaeology, Technology and Historical Structures Program</option>
+          <option>Art and Art History, Department of</option>
+          <option>Audio and Music Engineering Program</option>
+          <option>Biology, Department of</option>
+          <option>Biomedical Engineering, Department of</option>
+          <option>Brain and Cognitive Sciences, Department of</option>
+          <option>Business Program</option>
+          <option>Chemical Engineering, Department of</option>
+          <option>Chemistry, Department of</option>
+          <option>Classics, Religion and, Department of</option>
+          <option>Clinical and Social Sciences in Psychology, Department of</option>
+          <option value="Computer Science">Computer Science, Department of</option>
+          <option>Dance and Movement Program</option>
+          <option>Data Science Program</option>
+          <option>Digital Media Studies Program</option>
+          <option>Earth and Environmental Sciences, Department of</option>
+          <option>East Asian Studies Program</option>
+          <option>Economics, Department of</option>
+          <option>Electrical and Computer Engineering, Department of</option>
+          <option>English, Department of</option>
+          <option>Film and Media Studies Program</option>
+          <option>Gender, Sexuality, and Women's Studies Program</option>
+          <option>Health-Related Programs, Public</option>
+          <option>History, Department of</option>
+          <option>International Theatre Program</option>
+          <option>Linguistics, Department of</option>
+          <option>Materials Science Program</option>
+          <option>Mathematics, Department of</option>
+          <option>Mechanical Engineering, Department of</option>
+          <option>Modern Languages and Cultures, Department of</option>
+          <option>Music, Department of</option>
+          <option>Naval Science Program</option>
+          <option>Optics, Institute of</option>
+          <option>Philosophy, Department of</option>
+          <option>Physics and Astronomy, Department of</option>
+          <option>Political Science, Department of</option>
+          <option>Post-baccalaureate Pre-health Program</option>
+          <option>Psychology, Clinical and Social Sciences in, Department of</option>
+          <option>Public Health-related Programs</option>
+          <option>Religion and Classics, Department of</option>
+          <option>Russian Studies Program</option>
+          <option>Statistics Program</option>
+          <option>Theatre Program, International</option>
+          <option>Visual and Cultural Studies Program</option>
+          <option>Writing, Speaking, and Argument Program</option>-->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlSelect1">Course</label>
+        <select class="form-control" id="course-name-Select">
+<!--          <option>CSC 108 TECHNICAL COMPUTING</option>
+          <option>CSC 131 RECREATIONAL GRAPHICS</option>
+          <option>CSC 161 INTRO TO PROGRAMMING</option>
+          <option>CSC 170 WEB DESIGN AND DEVELOPMENT</option>
+          <option>CSC 171 INTRO TO COMPUTER SCIENCE</option>-->
+        </select>
+      </div>
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+        <button type="submit" class="addbtn" onclick="add_course()">Add</button>
+      </div>
+      <div id="hidden_info" style="display:none;"></div>
+    </div>
+  </form>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+
+var listOfCourseCRN = new Array();
+var listOfCourseId = new Array();
+var listOfCourseName = new Array();
+var listOfCourseLocation = new Array();
+var department = "csc";
+
+  $(document).ready(function(){
+    $('#dpt_list').on('click', function(){
+
+listOfCourseCRN = new Array();
+listOfCourseId = new Array();
+listOfCourseName = new Array();
+listOfCourseLocation = new Array();
+department = "csc";
+
+ data = "";
+        $('#dpt_list').html('SELECT DEPARTMENT!');
+        $.ajax({
+          url: '/getcoursesfromdepartment',
+          type: 'POST',
+          data: {'department':'csc'},
+         // contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log("SUCCESS!");
+      //      console.log(data.courses);
+			for(i=0; i<data.courses.length; i++){
+				console.log(data.courses[i].length);
+				var tempCourseCRN = data.courses[i][0];
+				var tempCourseId = data.courses[i][1] + data.courses[i][2];
+				var tempCourseName = data.courses[i][3];
+				var tempCourseLocation = data.courses[i][5];
+				listOfCourseCRN.push(tempCourseCRN);
+				listOfCourseId.push(tempCourseId);
+				listOfCourseName.push(tempCourseName);
+				listOfCourseLocation.push(tempCourseName);
+			}
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+
+
+
+
+
+
+
+
+
+      var school = $('#exampleFormControlSelect1').val();
+    //  alert("school is" + school);
+      if (school == 'Arts, Science, and Engineering'){
+        data = ""; 
+        $('#dpt_list').html('SELECT DEPARTMENT!');
+        $.ajax({
+          url: '/pfSchool_ase',
+          type: 'POST',
+          data: JSON.stringify({'school': school}),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log("SUCCESS!");
+            console.log(data.value_1);
+            var j=0;
+            while(data.value_1[j]){
+              var row = $('<option>');
+              row.append($('<span>').html(data.value_1[j]));
+              $('#dpt_list').append(row);
+              j = j+1;
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+      else {
+        data = ""; 
+        $('#dpt_list').html('SELECT DEPARTMENT!');
+        $.ajax({
+          url: '/pfSchool',
+          type: 'POST',
+          data: JSON.stringify({'school': school}),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+p
+            console.log("SUCCESS!");
+            console.log(data.value_1);
+            var j=0;
+            while(data.value_1[j]){
+              var row = $('<option>');
+              row.append($('<span>').html(data.value_1[j]));
+              $('#dpt_list').append(row);
+              j = j+1;
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+    });
+  });
+</script>
+
+<div id="Edit-prof" class="modal">
+  <span onclick="document.getElementById('Edit-prof').style.display='none'" class="close" title="Close Modal">×</span>
+  <form class="modal-content animate" action="{{url_for('edit_profile')}}" method="post" enctype="multipart/form-data">
+    <div class="container">
+      <div class="form-group">
+        <label class="custom-file">
+          <input type="file" id="file2" name = "image" class="custom-file-input">
+          <span class="custom-file-control"></span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="user-name">Username</label>
+        <input type="text" class="form-control" name="user_name" id="user-name" placeholder="username" required>
+
+
+
+      </div>
+      <div class="form-group">
+        <label for="user-bio">Bio</label>
+        <input type="text" class="form-control" name="user_bio" id="user-bio" placeholder="Brief intro about yourself." required>
+
+
+
+      </div>
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('Edit-prof').style.display='none'" class="cancelbtn">Cancel</button>
+
+        <button type="submit" class="addbtn">Add</button>
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Courses selection using Ajax made by JING SUN -->
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#course-name-Select').on('click', function(){
+      var course = $('#dpt_list').val();
+      if (course == 'Computer Science'){
+        data = '';
+        $('#course-name-Select').html('SELECT COURSES');
+        $.ajax({
+          url: '/pfCourse',
+          type: 'POST',
+          data: JSON.stringify({'department': course}),
+          contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log("SUCCESS!");
+            console.log(data.value_1);
+            console.log(data.value_1[0][0]);
+            console.log(data.value_1[2][1]);
+            var j=0;
+            while(data.value_1[j]){
+              var row = $('<option>');
+              for(var i=0; i<2; i++){
+                row.append($('<span>').html(data.value_1[j][i]));
+                row.append(" ");
+              }
+              $('#course-name-Select').append(row);
+              j = j+1;
+            }
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+      }
+      else{
+        data = '';
+        $('#course-name-Select').html('');
+        var row = $('<option>');
+        row.append($('<span>').html("WE WILL IMPLEMENT SOON! PLEASE WAIT! THANKS! "));
+        $('#course-name-Select').append(row);
+      }
+    });
+
+    $('#course-name-Select').on('change', function () {
+      data = '';
+      var course = $('#course-name-Select').val().split(" ");
+      course = course[0] + course[1];
+      $.ajax({
+        url: '/infoCourse',
+        type: 'POST',
+        data: JSON.stringify({'Course': course}),
+        contentType: 'application/json;charset=UTF-8',
+        success: function(data){
+          console.log("SUCCESS!");
+          console.log(data);
+//          $("#hid_pro").text(data.value_1);
+//          $("#hid_des").text(data.value_2);
+  	  var j=0;
+          while(data.value_1[j]){
+            var row = $('<div>');
+            for(var i=0; i<2; i++){
+              row.append($('<p>').html(data.value_1[j][i]));
+            }
+            $('#hidden_info').append(row);
+            j = j+1;
+          }
+        },
+        error: function(error){
+          console.log(error);
+        }
+      });
+    });
+  });
+</script>
+<!-- END OF Courses selection using Ajax made by JING SUN -->
+
+<script>
+
+var course_name = new Array();
+var course_discription = new Array();
+var course_CRN = new Array();
+    // Check browser support
+if (typeof(Storage) !== "undefined") {
+      // Store
+
+      
+  if(localStorage.getItem("course_name") === null || localStorage.getItem("course_discription") === null){
+     $.ajax({
+          url: '/getusercourses',
+          type: 'POST',
+	  async: false,
+          data: {},
+      //    contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log("SUCCESS!");
+            if(data.courses == null) alert("no such course");
+			else {
+            for(i=0; i<data.courses.length; i++){
+                console.log("building "+ i +" is"+data.courses[i][1].toLowerCase() + data.courses[i][2]);
+                var courseTemp = data.courses[i][1] + ' ' + data.courses[i][2];
+//		alert(data.courses[i][0]);
+                course_CRN.push(data.courses[i][0]);
+     		course_name.push(courseTemp);
+		course_discription.push(data.courses[i][7]);
+            }
+		    localStorage.course_name = JSON.stringify(course_name);
+		    localStorage.course_discription = JSON.stringify(course_discription);
+		 //   create_show_course();	   
+
+            }
+      //      $("#bd_marker").text(data.value_1);
+          },
+	  complete: function(){create_show_course()},
+          error: function(error){
+            console.log(error);
+          }
+        });//.done(create_show_course());
+
+        
+  } else {
+    course_name = JSON.parse(localStorage.course_name);
+    course_discription = JSON.parse(localStorage.course_discription);
+  //  create_show_course();
+    }
+} else {
+  document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Storage...";
+}
+
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+
+var Edit_prof = document.getElementById('Edit-prof');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == Edit_prof) {
+    Edit_prof.style.display = "none";
+  }
+};
+
+var show_course = new Array();
+
+function create_show_course(course_name, course_discription) {
+  if(course_name.length == 0 || course_discription.length == 0){
+    show_course = 'You have not choose any course';
+  }
+  show_course = new Array();
+  for(i=0; i<course_name.length; i++){
+    temp = '<div class="card-course"> ' +
+    '<div class="card-header" role="tab" id="heading'+ i + '"><h5 class="mb-0">'+
+    '<a class="collapsed" data-toggle="collapse" href="#collapse'+i+'" aria-expanded="false" aria-controls="collapse'+i+'"><span class="course-name">'+
+    course_name[i]+
+    '</span>'+
+    '<div class="remove-icon">'+
+    '<i class="material-icons" id="rmv-'+i+'" onclick="delete_course('+i+')">delete</i>'+
+    '</div>'+
+    '</a>'+
+    '</h5>'+
+    '</div>'+
+    '<div id="collapse'+i+'" class="collapse" role="tabpanel" aria-labelledby="heading'+i+'" data-parent="#accordion">'+
+    '<div class="card-body">'+
+    course_discription[i]+
+    '</div>'+
+    '</div>'+
+    '</div>';
+    show_course.push(temp);
+  }
+  return show_course;
+}
+
+function display(show_course){
+  var result = '';
+  for (i=0; i<show_course.length; i++){
+    result = result + show_course[i];
+  }
+  return result;
+}
+var show_course = create_show_course(course_name, course_discription);
+var display_course = display(show_course);
+
+
+document.getElementById("show-all-course").innerHTML = display_course;
+
+
+function delete_course(i){
+  alert(course_CRN[i]);
+
+  $.ajax({
+          url: ' /deletecourse',
+          type: 'POST',
+          data: {'crn': course_CRN[i]},
+      //    contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log(data.success);
+            
+      i//      $("#bd_marker").text(data.value_1);
+          },
+          error: function(error){
+            console.log(error);
+          }
+        });
+
+
+  course_name.splice(i,1);
+  course_discription.splice(i,1);
+  
+  course_CRN.splice(i,1);
+  localStorage.course_name = JSON.stringify(course_name);
+  localStorage.course_discription = JSON.stringify(course_discription);
+  show_course = create_show_course(course_name, course_discription);
+  display_course = display(show_course);
+  document.getElementById("show-all-course").innerHTML = display_course;
+}
+
+
+
+function add_course(){
+  var add_name = document.getElementById("course-name-Select").value;
+  var add_description = document.getElementById("hidden_info").value;
+  course_name.push(add_name);
+  console.log(add_name);
+  course_discription.push(add_description);
+  localStorage.course_name = JSON.stringify(course_name);
+  localStorage.course_discription = JSON.stringify(course_discription);
+  show_course = create_show_course(course_name, course_discription);
+  display_course = display(show_course);
+  var addName = add_name.split(" ");
+  var addNametemp = addName[0].toUpperCase() + addName[1];
+  console.log("addNametemp is " + addNametemp);
+  for(i=0; i<listOfCourseId.length; i++){
+	if(listOfCourseId[i] == addNametemp){
+	  addCRNtemp = listOfCourseCRN[i]
+	//  alert("addCRNtemp is " + addCRNtemp);
+	  $.ajax({
+          url: ' /addcoursebycrn',
+          type: 'POST',
+          data: {'crn': addCRNtemp},
+      //    contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            alert(data.success);
+            
+          },
+          error: function(error){
+            alert(error);
+          }
+        });
+	  break;
+	}	
+  }
+
+
+
+  //alert(show_course.length);
+/*  $.ajax({
+
+          url: '/getcrnofcourse2',
+
+          type: 'POST',
+
+          data: {'course},
+
+          dataType: "json",
+
+          contentType: 'application/json;charset=UTF-8',
+
+          success: function(msg){
+
+            alert("SUCCESS!");
+
+	    crnsss = msg.crns
+
+            console.log("this is return data:"+crnsss[0])
+
+          },
+
+          error: function(error){
+
+            alert("this is a error: "+error);
+
+          }
+
+        });*/
+      
+}
+
+$('#loginForm').submit(function (event) {
+  event.preventDefault();
+  $.ajax({
+    url: '/profileAjax',
+    data: $('#loginForm').serialize(),
+    type: 'POST',
+    success: function (response) {
+      console.log(response);
+      var result = JSON.parse(response);
+      console.log(result);
+      console.log(result.authOk);
+      console.log(result["authOk"]);
+      if (result["authOK"] === "OK"){
+        console.log("OK");
+        if (result["expires"].length == 0){
+          Cookies.set('session_key', result["cookie"]);
+        } else {
+          Cookies.set('session_key', result["cookie"], { expires: parseInt(result["expires"])});
+        }
+        window.location.reload();
+
+      } else if (result["authOK"] === "NO"){
+        console.log("ERROR");
+        $('#alert-top').html(
+          "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+          "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+          "  <span aria-hidden='true'>&times;</span>" +
+          "</button>" +
+          "<i class='material-icons'>info_outline</i><div id='alert_message'></div>" +
+          "</div>");
+          $('#alert_message').html(result["message"]);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+        $('#alert-top').html(
+          "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+          "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+          "  <span aria-hidden='true'>&times;</span>" +
+          "</button>" +
+          "<i class='material-icons'>info_outline</i><div id='alert_message'>There seems to be something wrong wit the server. Try again later!</div>" +
+          "</div>");
+          $('#alert_message').html(error["message"]);
+        }
+      });
+    });
+
+function addNewCourseToDB(crnTempid){
+	alert("crnTemp is :" + crnTempid);
+        $.ajax({
+          url: '/addcoursebycrn',
+          type: 'POST',
+          data: {'crn': crnTempid.toString()},
+      //    contentType: 'application/json;charset=UTF-8',
+          success: function(data){
+            console.log(data.success);
+            alert("hello success");
+
+      //      $("#bd_marker").text(data.value_1);
+          },
+          error: function(error){
+            console.log(error);
+            alert("second ajax error");
+          }
+        });
+}
+</script>
+
+
+{% endblock %}

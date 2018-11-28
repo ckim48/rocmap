@@ -1,0 +1,172 @@
+{% extends "core.html" %} {% block title %}Index{% endblock %} {% block body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<style>
+    .fill-auto {
+        display: flex;
+        width: 100%;
+    }
+
+    .fill-left {
+        width: 100% !important;
+    }
+
+    .fill-right {
+        width: 80px;
+    }
+
+    .flex-grow {
+        flex: 1;
+    }
+
+    .chat-profile {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 5px solid rgba(255, 255, 255, 0.5);
+    }
+    #loadMoreBtn {
+        width: 100%
+    }
+
+    .chat-item {
+        border: none;
+    }
+    .chat-profile {
+        display: inline-block;
+    }
+    .chat-div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .btn-circle.btn-lg {
+      width: 50px;
+      height: 50px;
+      padding: 12px 10px;
+      font-size: 18px;
+      line-height: 1.2;
+      border-radius: 25px;
+    }
+
+    .toTopBtn {
+      position: fixed;
+      bottom: 48px;
+      right: 48px;
+    }
+</style>
+<div class="container-fluid">
+    <button type="button" class="btn btn-outline-dark" id="loadMoreBtn">Load More</button>
+    <div class="flex-grow">
+        <ul class="list-group">
+            {% for chat in msg %}
+            <li class="list-group-item chat-item">
+                <img src='{{ chat.photo }}' class="chat-profile rounded">
+                <div class="chat-div">
+                  <div>{{ chat.time }}</div>
+                  <div>{{ chat.name }}</div>
+                  <div>{{ chat.content }}</div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form id="chat-form" class="form-inline">
+        <div class="fill-auto">
+            <input id="chatspace" class="form-control fill-left" type="text" placeholder="Type your chat here">
+            <button id="sendchat" type="submit" class="btn btn-primary fill-right">Send</button>
+        </div>
+    </form>
+</div>
+<button type="button" class="toTopBtn btn btn-info btn-circle btn-lg"><i class="material-icons">keyboard_arrow_up</i></button>
+
+
+<script>
+    $(document).ready(function () {
+        $('.toTopBtn').hide();
+
+        var loadedCount = {{ chatSize }};
+        window.scrollTo(0, document.body.scrollHeight);
+
+        var socket = io.connect('https://' + document.domain + ':' + location.port + '/chatroom');
+        socket.on('message', function (msg) {
+          $('.list-group').append('<li class="list-group-item chat-item"><img src="' + msg.photo + '" class="chat-profile rounded"><div class="chat-div"><div>' + msg.time + "</div><div>" + msg.name + '</div><div>' + msg.content + '</div></div></li>');
+
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+        $('#chat-form').submit(function (event) {
+            event.preventDefault();
+            socket.emit('text', {msgContent: $('#chatspace').val()});
+            $('#chatspace').val("");
+            return false;
+        });
+
+        $('sendchat').click(function (event) {
+            event.preventDefault();
+            socket.emit('text', {msgContent: $('#chatspace').val()});
+            $('#chatspace').val("");
+            return false;
+        });
+
+        var btnVisible = false;
+        $(window).scroll(function () {
+
+            if ($(window).scrollTop() == 0) {
+//                showAlert('top', true);
+                //Add load more functions using loadCount and Ajax
+            }
+
+            if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+                if (btnVisible == true){
+                  $('.toTopBtn').hide();
+                  btnVisible = false;
+                }
+            } else {
+              if (btnVisible == false){
+                $('.toTopBtn').show();
+                btnVisible = true;
+              }
+            }
+        });
+
+        $('.toTopBtn').click(function(){
+            $('html, body').animate({scrollTop: '0px'}, 300);
+            //TODO SCROLL TO TOP
+        });
+
+        $('#loadMoreBtn').click(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '/getChatAJAX',
+                data: {"loadedMsgCount": loadedCount},
+                type: 'POST',
+                success: function (response) {
+                    var result = JSON.parse(response);
+                    console.log(result);
+
+                    for (var i = 0; i < result.length; i++) {
+                        msg = result[i];
+                        loadedCount++;
+                        $('.list-group').prepend('<li class="list-group-item chat-item"><img src="' + msg.photo + '" class="chat-profile rounded"><div class="chat-div"><div>' + msg.time + "</div><div>" + msg.name + '</div><div>' + msg.content + '</div></div></li>');
+                    }
+                    if (result.length > 0) {
+                        showAlert('Loaded more messages', true);
+                    } else {
+                        showAlert('There are no more messages', false);
+                    }
+
+                }
+                ,
+                error: function (error) {
+                    console.log(error);
+                    showAlert('Failed to load more messages', false);
+//                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+                }
+            });
+        });
+    })
+
+
+
+</script>
+{% endblock %}

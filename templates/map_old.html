@@ -1,0 +1,423 @@
+{% extends "core.html" %}
+{% block title %}Index{% endblock %}
+{% block body %}
+<style>
+    html, body {
+        font-family: Arial, sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: calc(100% - 54px);
+
+    }
+
+    #log-container {
+        position: absolute;
+        top: 10px;
+        left: 80%;
+        z-index: 5;
+        height: 10%;
+        background-color: none;
+        padding: 5px;
+        text-align: center;
+    }
+
+    #search-panel {
+        position: absolute;
+        top: 40px;
+        left: 65%;
+        z-index: 5;
+        height: 50%;
+        background-color: #fff;
+        padding: 5px;
+        text-align: center;
+    }
+
+    #pano {
+        width: 200px;
+        height: 200px;
+    }
+
+    .class-word {
+        text-align: center;
+    }
+
+    .vertical-alignment-helper {
+        display: table;
+        height: 100%;
+        width: 100%;
+        pointer-events: none; /* This makes sure that we can still click outside of the modal to close it */
+    }
+
+    .vertical-align-center {
+        /* To center vertically */
+        display: table-cell;
+        vertical-align: middle;
+        pointer-events: none;
+    }
+
+    .modal-content {
+        /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+        width: inherit;
+        max-width: inherit; /* For Bootstrap 4 - to avoid the modal window stretching full width */
+        height: inherit;
+        /* To center horizontally */
+        margin: 0 auto;
+        pointer-events: all;
+    }
+
+    #alert-top {
+        margin-top: 24px;
+    }
+
+    #hidden_info {
+    /*TEST 2*/
+        display:none;
+        position: fixed;
+        top: 10%;
+        left: 10%;
+        width: 70%;
+        height: 50%;
+        border: 2px solid #999;
+        border-radius: 5px;
+        background-color: #ddd;
+        z-index: 999;
+    /*END OF TEST 2*/
+    }
+</style>
+
+
+<nav class="navbar navbar-dark bg-dark">
+
+
+    <!-- add logout button here -->
+    <div>
+        {% if isLogined %}
+        <form action = "{{ url_for('profile') }}" style="display: inline-block;">
+            <button class = "btn btn-success" type = "submit">Profile</button>
+        </form>
+        <form action="{{ url_for('logout') }}" style="display: inline-block;">
+            <button class="btn btn-primary" type="submit">Logout</button>
+        </form>
+
+        {% else %}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">Login</button>
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+             aria-hidden="true">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                            <div id="alert-top">
+                            </div>
+                            <form id="loginForm" name="loginForm" style="margin: 18px;">
+                                <div class="form-group">
+                                    <label for="Email1">Email address</label>
+                                    <input type="email" class="form-control" id="Email1" name="usr_email"
+                                           aria-describedby="emailHelp" placeholder="Enter email" required>
+                                    <small id="emailHelp" class="form-text text-muted">We"ll never share your email with
+                                        anyone else.
+                                    </small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Password">Password</label>
+                                    <input type="password" class="form-control" id="Password" name="usr_password"
+                                           placeholder="Password" required>
+                                </div>
+                                <div class="text-right">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" id="stayloggedin" name="chk_box"
+                                                   class="form-check-input"
+                                                   value="unchecked"> Stay Logged In</label>
+                                    </div>
+                                    <p><a href="{{ url_for('register') }}">Not a menber yet?</a></p>
+
+
+                                    <fieldset class="form-group">
+                                        <input class="btn btn-success" type ="submit" id ="auth" name="submit" value="Log in!">
+                                    </fieldset>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>      
+        {% endif %}
+    </div>
+    <form class="form-inline">
+        <input id="address" class="form-control mr-sm-2" type="textbox" value="Rushrhees Library">
+        <input id="submit" class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search">
+    </form>
+</nav>
+
+
+<div id="map"></div>
+
+<!--TEST 2-->
+<div class="panel panel-default" id="hidden_info">
+    <div class="pane-heading">Building: <span id="bdg">{{ value_1 }}</span></div>
+    <div class="panel-body">Courses: <span id="crs">{{ value_2 }}</span></div>
+    <button class="center" onlick="close_info()">CLOSE</button>
+</div>
+<!--END OF TEST 2-->  
+
+
+
+<script>
+    $('#loginForm').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/authenticateAJAX',
+            data: $('#loginForm').serialize(),
+            type: 'POST',
+            success: function (response) {
+                console.log(response);
+                var result = JSON.parse(response);
+                console.log(result);
+                console.log(result.authOk);
+                console.log(result["authOk"]);
+                if (result["authOK"] === "OK"){
+                  console.log("OK");
+                  if (result["expires"].length == 0){
+                    Cookies.set('session_key', result["cookie"]);
+                  } else {
+                    Cookies.set('session_key', result["cookie"], { expires: parseInt(result["expires"])});
+                  }
+                  window.location.reload();
+                } else if (result["authOK"] === "NO"){
+                  console.log("ERROR");
+                  $('#alert-top').html(
+                    "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+                    "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+                    "  <span aria-hidden='true'>&times;</span>" +
+                    "</button>" +
+                    "<i class='material-icons'>info_outline</i><div id='alert_message'></div>" +
+                    "</div>");
+                  $('#alert_message').html(result["message"]);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+                $('#alert-top').html(
+                  "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+                  "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+                  "  <span aria-hidden='true'>&times;</span>" +
+                  "</button>" +
+                  "<i class='material-icons'>info_outline</i><div id='alert_message'>There seems to be something wrong wit the server. Try again later!</div>" +
+                  "</div>");
+                $('#alert_message').html(error["message"]);
+            }
+        });
+    });
+
+
+</script>
+
+
+
+<script>
+    var temp = {lat: 43.123050300, lng: -77.626940300};
+    var marker;
+    var map;
+    var defaultIcon;
+    var highlightedIcon;
+    var largeInfowindow;
+
+    function myMap() {
+        var mapOptions = {
+            center: new google.maps.LatLng(43.123050300, -77.626940300),
+            zoom: 17,
+            mapTypeId: google.maps.MapTypeId.roadmap
+        }
+
+        map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        defaultIcon = makeMarkerIcon('0091ff');
+        highlightedIcon = makeMarkerIcon('FFFF24');
+        var geocoder = new google.maps.Geocoder();
+        largeInfowindow = new google.maps.InfoWindow();
+
+
+        document.getElementById('submit').addEventListener('click', function () {
+            if (marker) {
+                marker.setMap(null);
+            }
+            geocodeAddress(geocoder, map);
+
+
+        });
+
+        $(document).ready(function () {
+            $('.form-inline').submit(function (e) {
+                e.preventDefault();
+                if (marker) {
+                    marker.setMap(null);
+                }
+                geocodeAddress(geocoder, map);
+                return false;
+            });
+        });
+
+
+    }
+
+    function geocodeAddress(geocoder, resultsMap) {
+        var address = document.getElementById('address').value + 'Rochester';
+        geocoder.geocode({'address': address}, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                resultsMap.setCenter(results[0].geometry.location);
+                resultsMap.setZoom(18);
+                temp.lat = results[0].geometry.location.lat();
+                temp.lng = results[0].geometry.location.lng();
+                marker = new google.maps.Marker({
+                    position: temp,
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    title: 'Rushrhees',
+                    icon: defaultIcon
+                    //	id: i
+                });
+                marker.addListener('mouseover', function () {
+                    this.setIcon(highlightedIcon);
+                });
+
+                marker.addListener('mouseout', function () {
+                    this.setIcon(defaultIcon);
+                });
+
+                marker.addListener('click', function () {
+                    populateInfoWindow(this, largeInfowindow);
+                });
+
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    }
+
+    function populateInfoWindow(marker, infowindow) {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            // Clear the infowindow content to give the streetview time to load.
+            infowindow.setContent('');
+            infowindow.marker = marker;
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function () {
+                infowindow.marker = null;
+            });
+            var streetViewService = new google.maps.StreetViewService();
+            var radius = 50;
+            // In case the status is OK, which means the pano was found, compute the
+            // position of the streetview image, then calculate the heading, then get a
+            // panorama from that and set the options
+            function getStreetView(data, status) {
+                if (status == google.maps.StreetViewStatus.OK) {
+                    var nearStreetViewLocation = data.location.latLng;
+
+                    // this is used for create th info window on the map
+                    var contentString = '<div>' + marker.title + 'we get it for you</div><div id="pano"></div>' +
+                        '<div> CSC 160 : web programming' +
+                        '<div class="class-word" id="class1">CSC 440 ： hello world</div>' +
+                        '<div class="class-word" id="class2">CSC 440 ： hello world</div>' +
+                        '<div class="class-word" id="class3">CSC 440 ： hello world</div>' +
+                        '<div class="class-word" id="class4">CSC 440 ： hello world</div>' +
+                        '<div class="class-word" id="class5">CSC 440 ： hello world</div>' +
+                        '<button id="WEGMN">view all Courses!</button>' +
+                        '</div>'
+
+                    var heading = google.maps.geometry.spherical.computeHeading(
+                        nearStreetViewLocation, marker.position);
+                    infowindow.setContent(contentString);
+                    var panoramaOptions = {
+                        position: nearStreetViewLocation,
+                        pov: {
+                            heading: heading,
+                            pitch: 30
+                        }
+                    };
+                    var panorama = new google.maps.StreetViewPanorama(
+                        document.getElementById('pano'), panoramaOptions);
+                    //	alert('happan');
+
+                    //TEST 2
+                    $(document).ready(function(){
+                        $('button').on('click', function(){
+                            infowindow.close();
+                            var bd = this.id;
+                            $.ajax({
+                                url: '/bdInfo',
+                                type: 'POST',
+                                data: JSON.stringify({'name': bd}),
+                                contentType: 'application/json;charset=UTF-8',
+                                success: function(data){
+                                    $("#hidden_info").show();
+                                    console.log(data);
+                                    $("#bdg").val(data[0]);
+                                    $("#crs").val(data[1]);
+                                },
+                                error: function(error){
+                                    console.log(error);
+                                }
+                            });
+                    
+                          
+                        });
+                    });
+
+                    function clickOther(e){
+                        thisObj = e.target?e.target:event.srcElement;
+                        if(thisObj.id=="hidden_info")return;
+                        else{
+                            $("#hidden_info").hide();
+                        }
+                    }
+
+                    function close_info(){
+                        document.getElementById('hidden_info').hide();
+                    }
+                    //END OF TEST 2
+
+                } 
+                else {
+                    infowindow.setContent('<div>' + marker.title + '</div>' +
+                        '<div>No Street View Found</div>');
+                }
+            }
+
+            // Use streetview service to get the closest streetview image within
+            // 50 meters of the markers position
+            streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+            // Open the infowindow on the correct marker.
+            infowindow.open(map, marker);
+        }
+    }
+
+    function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+            '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21, 34));
+        return markerImage;
+
+    }
+</script>
+
+<script async defer
+
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlDn1p_hc7UfF1sfKEdHaz_0fnyJZIDk0&callback=myMap">
+
+</script>
+{% endblock %}

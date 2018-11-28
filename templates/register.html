@@ -1,0 +1,117 @@
+{% extends "core.html" %} {% block title %}Rocmap-Sign up{% endblock %} {% block body %}
+
+
+<style>
+    html {
+        background: url("/static/images/background-rushree.jpg") no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    body {
+        height: 100vh;
+        background: none;
+        color: #FFF;
+    }
+
+    .container {
+        text-align: center;
+        width: 400px;
+        margin-top: 150px;
+    }
+
+    select:disabled {
+        cursor: not-allowed;
+        pointer-events: all !important;
+    }
+
+</style>
+{% if authFailure %}
+<div class="fixed-top">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+   <span aria-hidden="true">&times;</span>
+ </button>
+        <i class="material-icons">info_outline</i> {{ authFailure }}
+    </div>
+</div>
+{% endif %}
+<div class="container" id="homePageContainer">
+    <div class="row justify-content-center h-100 align-items-center">
+        <h1>UR map</h1>
+        <p><strong>Sign up NOW!.</strong></p>
+        <form name="form" method="post" action="{{ url_for('registerUser') }}">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="usr">E-mail</label>
+                    <input type="text" class="form-control" id="usr" placeholder="E-mail" name="email" required> </div>
+                <div class="col-md-6 mb-3">
+                    <label for="pwd">Password</label>
+                    <input type="password" class="form-control" id="pwd" placeholder="Password" name="password" required> </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="nm">Name</label>
+                    <input type="text" class="form-control" id="nm" placeholder="Name" name="name" required> </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="sch">School</label>
+                    <select class="form-control" id="school-select" placholder="School" name="school" required>
+                                    <option value="">Select School</option>
+                                    <option value="artsandscience">School of Arts and Sciences</option>
+                                    <option value="engineering">Hajim School of Engineering and Applied Sciences</option>
+                                    <option value="other">Other</option>
+                                </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="sub">Major</label>
+                    <select id="major" class="form-control" id="sub" name="major" required disabled>
+                        <option value="">Please select your school</option>
+                    </select>
+                </div>
+            </div>
+            <div class="buttonHolder"><button class="btn btn-primary" type="submit">Sign up</button></div>
+        </form>
+        <p><a class="toggleForms">Already have an account? Please <a href="https://rocmap.net">Login</a></p>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#school-select').on('change', function() {
+            var engMajors = ["Audio and Music Engineering", "Biomedical Engineering", "Chemical Engineering", "Computer Science", "Data Science", "Electrical and Computer Engineering", "Geomechanics", "Interdepartmental Engineering", "Engineering Science", "Mechanical Engineering", "Optical Engineering", "Optics", "Other"];
+            var otherMajors = ["African and African American Studies",  "American Sign Language",  "American Studies",  "Anthropology",  "Applied Mathematics",  "Archaeology, Technology and Historical Structures",  "Art History",   "Biological Sciences",  "Biology",  "Brain and Cognitive Sciences",  "Business",  "Chemistry",  "Classics",  "Comparative Literature",  "Dance",  "Data Science",  "Digital Media Studies",  "East Asian Studies",  "Economics",  "English",  "Environmental Science",  "Environmental Studies",  "Epidemiology",  "Film and Media Studies",  "Financial Economics",  "French",  "Gender, Sexuality, and Women\'s Studies",  "Geological Sciences",  "Geomechanics",  "German",  "Health, Behavior, and Society",  "Health Policy",  "History",  "Interdepartmental Studies",  "International Relations",  "Japanese",  "Linguistics",  "Mathematics",  "Mathematics and Statistics",  "Music",  "Philosophy",  "Physics",  "Political Science",  "Psychology",  "Bioethics",  "Environmental Health",    "Religion",  "Russian",  "Russian Studies",  "Spanish",  "Statistics",  "Studio Arts", "Other"];
+            if (this.value == 'artsandscience') {
+                $('#major').html('<option value="">Select Major</option>');
+                var x;
+                for (i = 0; i < otherMajors.length; i++) {
+                    $('#major').append("<option>" + otherMajors[i] + "</option>");
+                }
+                $('#major').removeAttr('disabled');
+            } else if (this.value == 'engineering') {
+                $('#major').html('<option value="">Select Major</option>');
+                var x;
+                for (i = 0; i < engMajors.length; i++) {
+                    $('#major').append("<option>" + engMajors[i] + "</option>");
+                }
+                $('#major').removeAttr('disabled');
+            }  else if (this.value == 'other') {
+                $('#major').html('<option value="">Select Major</option>');
+                $('#major').append("<option>Other</option>");
+                $('#major').removeAttr('disabled');
+            } else {
+                $('#major').html('<option value="">Please select your school</option>');
+                $('#major').attr('disabled', 'disabled');
+            }
+        })
+
+    });
+
+</script>
+
+{% endblock %}

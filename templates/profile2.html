@@ -1,0 +1,704 @@
+<!-- Modified by Seungho on 2017/11/15 11:44 AM -->
+<!-- Added Core.html and Flask template implementations and fixed .js and .css errors -->
+<!-- Modified by JING SUN on 2017/11/18 11:14 AM -->
+
+{% extends "core2.html" %} {% block title %}Profile{% endblock %} {% block body %}
+
+<style>
+    .card {
+        width: 100%;
+        position: relative;
+        margin-top: 20px;
+        padding: 0px;
+        background-color: rgba(214, 224, 226, 0.2);
+        -webkit-border-top-left-radius: 5px;
+        -moz-border-top-left-radius: 5px;
+        border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-top-right-radius: 5px;
+        border-top-right-radius: 5px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    
+    .card.hovercard {
+        position: relative;
+        padding-top: 0;
+        overflow: hidden;
+        text-align: center;
+        background-color: #fff;
+        background-color: rgba(255, 255, 255, 1);
+    }
+    
+    .card.hovercard .card-background {
+        height: 180px;
+    }
+    
+    .card-background img {
+        -webkit-filter: blur(25px);
+        -moz-filter: blur(25px);
+        -o-filter: blur(25px);
+        -ms-filter: blur(25px);
+        filter: blur(25px);
+        margin-left: -100px;
+        margin-top: -200px;
+        min-width: 130%;
+    }
+    
+    .card.hovercard .useravatar {
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+    }
+    
+    .card.hovercard .useravatar img {
+        width: 100px;
+        height: 100px;
+        max-width: 100px;
+        max-height: 100px;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        border: 5px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .card.hovercard .card-info {
+        position: absolute;
+        bottom: 34px;
+        left: 0;
+        right: 0;
+    }
+    
+    .card.hovercard .card-info .card-title {
+        padding: 0 10px;
+        font-size: 20px;
+        line-height: 1;
+        color: #262626;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+    }
+    
+    .card.hovercard .card-info-bio {
+        position: absolute;
+        bottom: 14px;
+        left: 0;
+        right: 0;
+    }
+    
+    #card-Edit {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .edit-icon {
+        color: #e2e2e2;
+        font-size: 20px;
+    }
+    
+    .edit-icon:hover {
+        color: white;
+    }
+    
+    .card.hovercard .card-info .card-title-bio {
+        padding: 0 10px;
+        font-size: 20px;
+        line-height: 1;
+        color: #262626;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+    }
+    
+    .card.hovercard .card-info {
+        overflow: hidden;
+        font-size: 12px;
+        line-height: 20px;
+        color: #737373;
+        text-overflow: ellipsis;
+    }
+    
+    .card.hovercard .bottom {
+        padding: 0 20px;
+        margin-bottom: 17px;
+    }
+    
+    .courses {
+        display: inline-block;
+        width: 100%;
+        position: relative;
+        left: 50%;
+        margin-top: 6px;
+        margin-bottom: 0;
+        padding: 10px 10px 10px 20px;
+        background-color: #F7F9F9;
+    }
+    
+    .card-course {
+        width: 100%;
+        position: relative;
+        left: 50%;
+        margin-top: 0;
+        padding: 3px 0 0 0;
+        border-radius: 5px;
+    }
+    
+    .course-title {
+        float: left;
+        color: #262626;
+    }
+    
+    .add-icon {
+        padding: 0 10px 0 0;
+        float: right;
+    }
+    
+    .remove-icon {
+        float: right;
+    }
+    
+    a:hover {
+        color: #651296;
+        text-decoration: none;
+    }
+    /* Set a style for all buttons */
+    
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+    /* Extra styles for the cancel button */
+    
+    .cancelbtn {
+        padding: 14px 20px;
+        background-color: #f44336;
+    }
+    /* Float cancel and signup buttons and add an equal width */
+    
+    .cancelbtn,
+    .addbtn {
+        float: left;
+        width: 50%
+    }
+    /* Add padding to container elements */
+    
+    .container {
+        padding: 20px;
+    }
+    /* The Modal (background) */
+    
+    .modal {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 4;
+        /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        /* Full width */
+        height: 100%;
+        /* Full height */
+        overflow: auto;
+        /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0);
+        /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4);
+        /* Black w/ opacity */
+        padding-top: 60px;
+    }
+    /* Modal Content/Box */
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto 15% auto;
+        /* 5% from the top, 15% from the bottom and centered */
+        border: 1px solid #888;
+        width: 80%;
+        /* Could be more or less, depending on screen size */
+    }
+    /* The Close Button (x) */
+    
+    .close {
+        position: absolute;
+        right: 35px;
+        top: 15px;
+        color: #000;
+        font-size: 40px;
+        font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+        color: red;
+        cursor: pointer;
+    }
+    /* Clear floats */
+    
+    .clearfix::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+    /* Change styles for cancel button and signup button on extra small screens */
+    
+    @media screen and (max-width: 300px) {
+        .cancelbtn,
+        .addbtn {
+            width: 100%;
+        }
+    }
+    /* Seungho  */
+    
+    .row {
+        margin: 0 0 0 0;
+        background-color: #51595B;
+    }
+    
+    .delete-course {
+        float: right;
+        color: #007bff;
+    }
+    
+    .delete-course:hover {
+        color: #0056b3;
+        cursor: pointer;
+    }
+    
+    .add-course {
+        float: right;
+        line-height: 1.1;
+    }
+    
+    .align-self-custom-center {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .add-course-wrapper {
+        margin-bottom: 20px;
+    }
+    
+    #add-course-list {
+        margin-bottom: 12px;
+    }
+    
+    .divider {
+        width: 90%;
+        border-bottom: 1px solid #868e96;
+        margin: auto;
+    }
+    
+    .loading {
+        width: 140px;
+        height: 140px;
+        border: 14px solid #e2e2e2;
+        border-top: 14px solid #343a40;
+        border-radius: 50%;
+        animation: spin 4s linear infinite;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        z-index: 10;
+        display: none;
+    }
+    
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .collapse {
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        padding-top: 10px;
+    }
+
+</style>
+<div class="loading"></div>
+<div class="row">
+    <div class="col-lg-3 col-sm-3"></div>
+    <div class="col-lg-6 col-sm-6">
+        <div class="card hovercard">
+            <div class="card-background">
+                <img class="card-bkimg" src="{{ url_for('static', filename= 'profile_pic/' + user_image)}}">
+            </div>
+            <div class="useravatar">
+                <img src="{{ url_for('static', filename= 'profile_pic/' + user_image)}}">
+            </div>
+
+            <div class="card-info"> <span class="card-title">{{ user_name }}</span>
+            </div>
+
+            <!--<div id="card-Edit" onclick="document.getElementById('Edit-prof').style.display='block'"> <span class= "btn btn-outline-info">Change Your Info!</span>
+    </div>-->
+
+            <!--test by Shaoyi Huang-->
+            <div id="card-Edit" onclick="document.getElementById('Edit-prof').style.display='block'"> <span><i class="material-icons edit-icon">mode_edit</i></span>
+            </div>
+            <!--test by Shaoyi Huang-->
+
+            <div class="card-info-bio"> <span class="card-title-bio"><i>{{user_bio}}</i></span>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div id="Edit-prof" class="modal">
+    <span onclick="document.getElementById('Edit-prof').style.display='none'" class="close" title="Close Modal">×</span>
+    <form class="modal-content animate" action="{{url_for('edit_profile')}}" method="post" enctype="multipart/form-data">
+        <div class="container">
+            <div class="form-group">
+                <label class="custom-file">
+          <input type="file" id="file2" name = "image" class="custom-file-input">
+          <span class="custom-file-control"></span>
+        </label>
+            </div>
+            <div class="form-group">
+                <label for="user-name">Username</label>
+                <input type="text" class="form-control" name="user_name" id="user-name" placeholder="username" required>
+
+
+
+            </div>
+            <div class="form-group">
+                <label for="user-bio">Bio</label>
+                <input type="text" class="form-control" name="user_bio" id="user-bio" placeholder="Brief intro about yourself." required>
+
+
+
+            </div>
+            <div class="clearfix">
+                <button type="button" onclick="document.getElementById('Edit-prof').style.display='none'" class="cancelbtn">Cancel</button>
+
+                <button type="submit" class="addbtn">Add</button>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    var Edit_prof = document.getElementById('Edit-prof');
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == Edit_prof) {
+            Edit_prof.style.display = "none";
+        }
+    };
+
+</script>
+
+
+<div class="row">
+
+    <div class="col-lg-3 col-sm-3"></div>
+    <div class="col-lg-6 col-sm-6">
+        <div class="add-course-wrapper">
+            <div class="list-group" id="add-course-list" data-toggle="collapse" data-target="#courseCollapse" aria-expanded="false" aria-controls="courseCollapse">
+                <li href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 align-self-custom-center">Add Course</h5>
+                        <!--                    <i class="material-icons add-course">add_circle_outline</i>-->
+                    </div>
+                </li>
+            </div>
+
+            <div class="collapse" id="courseCollapse">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="sub">Department</label>
+                        <select id="major" class="form-control" name="major" required>
+                                <option value="">Please select department</option>
+                            </select>
+                    </div>
+                    <div class="col-md-12 mb-3 course-list">
+                        <label for="sub">Course</label>
+                        <select id="course" class="form-control" name="course" required disabled>
+                                <option value="">Please select course</option>
+                            </select>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <button type="button" class="btn btn-outline-secondary" id="addCourse" disabled>Add</button>
+                    </div>
+
+                </div>
+                <!--
+<form id="courseSearchAddForm" name="courseSearchForm">
+    <div class="divider"></div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+</form>
+-->
+            </div>
+        </div>
+        <div class="list-group" id="course-list">
+            <!-- Placeholder -->
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Department Course Name</h5>
+                    <small>crn number</small>
+                </div>
+                <p class="mb-1">Course Desc</p>
+                <small>Instructor, Room, Time</small>
+                <i class="material-icons delete-course">delete</i>
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        //Add school / major listener
+        school_related();
+        //Load User's Courses
+        load_courses();
+        //Add User course event listener
+        add_course_related();
+
+
+    });
+
+    function add_course_related() {
+        $('#addCourse').click(function() {
+            var crn = $('#course').val();
+            console.log("Adding course " + crn);
+            add_course(crn);
+        });
+    }
+
+    function shorten(str) {
+        if (str.length > 20)
+            return str.substring(0, 19) + '...';
+        else
+            return str;
+    };
+
+    function hideifnull(str) {
+        if (str == 'null' || str == 'undefined') {
+            return '';
+        }
+        return str;
+    }
+
+    function hideifnulltime(str) {
+        if (str.includes('null') || str == 'undefined') {
+            return '';
+        }
+        return str;
+
+    }
+
+    function school_related() {
+        var departmentCode = ["AAS ", "AH ", "AME ", "AMS ", "ANT ", "ARA ", "ASL ", "AST ", "ATH ", "BCS ", "BIO ", "BME ", "CAS ", "CGR ", "CHE ", "CHI ", "CHM ", "CLA ", "CLT ", "CSC ", "CSP ", "CVS ", "DAN ", "DMS ", "DSC ", "EAS ", "ECE ", "ECO ", "EES ", "EHU ", "ENG ", "ERG ", "FMS ", "FR ", "GER ", "GSW ", "HEB ", "HIS ", "IR ", "IT ", "JPN ", "JST ", "KOR ", "LAT ", "LIN ", "LTS ", "ME ", "MSC ", "MTH ", "MUR ", "NAV ", "NSC ", "OPT ", "PEC ", "PH ", "PHL ", "PHY ", "POL ", "POR ", "PPC ", "PSC ", "PSY ", "REL ", "RST ", "RUS ", "SA ", "SAB ", "SKT ", "SOC ", "SP ", "STT ", "SUS ", "TCS ", "TEB ", "TEC ", "TEE ", "TEM ", "TEO ", "TME ", "TUR ", "WRT "];
+
+        var department = ["African & African-American Studies", " Art & Art History-Art History", "Audio Music Engineering", "American Studies", "Anthropology", "Religion & Classics - Arabic", "American Sign Language", "Astronomy", "Digital Archaeology Africa", "Brain and Cognitive Science", "Biology", "Biomedical Engineering", "College of Arts & Science", "Religion & Classics - Classical Greek", "Chemical Engineering", "Modern Languages & Cultures - Chinese", "Chemistry", "Religion & Classics - Classical Studies", "Modern Languages & Cultures - Comparative Literature", "Computer Science", "Clinical and Social Science in Psychology", "Center for Visual Science", "Dance", "Digital Media Studies", "Data Science & Computation", "Engineering and Applied Sciences", "Electrical and Computer Engineering", "Economics", "Earth & Environmental Science", "Environmental Humanities", "English", "Alternative Energy", "Film and Media Studies", " Modern Language & Cultures - French", "Modern Languages & Cultures - German", "Gender", "Religion & Classics - Hebrew", "History", " International Relations", " Modern Languages & Cultures - Korean", "Modern Languages & Cultures - Japanese", "Judaic Studies", "Modern Languages & Cultures - Korean", "Religion & Classics - Latin", "Linguistics", "Literary Translation Studies", " Mechanical Engineering", "Materials Science", "Mathematics", "Music", "Naval Science", "Neuroscience", "Optics", "Wallis Institute of Political Economics", " Public Health", "Philosophy", "Physics", "Modern Languages & Cultures - Polish", "Modern Languages & Cultures - Portuguese", "Photographic Preservation & Collections Management", "Political Science", "Psychology", "Religion and Classics", "Modern Languages & Cultures - Russian Studies", "Modern Languages & Cultures - Russian", " Art & Art History-Studio Arts", "Study Abroad", "Religion & Classics - Sanskrit", "Sociology", " Modern Languages & Cultures - Spanish", "Statistics", "Sustainability", "TEAM Computer Science", "TEAM Biomedical Engineering", "TEAM Chemical Engineering", "TEAM Electrical Engineering", "Technical Entrepreneurship Management", "TEAM Optics", "TEAM Mechanical Engineering", "Religion & Classics - Turkish", "Writing Program "];
+
+        for (i = 0; i < department.length; i++) {
+            $('#major').append("<option value=" + departmentCode[i] + ">" + department[i] + "</option>");
+        }
+
+        $('#major').on('change', function() {
+            $('#course').html('<option value="">Please wait</option>')
+            var code = $(this).val();
+            $(".loading").show();
+            console.log("search course called with " + code);
+            $.ajax({
+                url: '/getcoursesfromdepartment',
+                data: 'department=' + code,
+                type: 'POST',
+                success: function(response) {
+                    $(".loading").hide();
+                    console.log(response);
+                    if (response.success == "yes") {
+                        console.log("ajax success ok");
+                        //                        showAlert("Courses loaded!", true);
+
+                        if (response.courses == null || response.courses.length == 0) {
+                            console.log("courses is either null or length is 0");
+                            showAlert('Sorry! It seems like there are no courses for that department', false);
+                            $('#course').html('<option value="">Please select course</option>')
+                            $('#course').prop('disabled', true);
+                            $('#addCourse').prop('disabled', true);
+                            $('#addCourse').removeClass('btn-outline-primary');
+                            $('#addCourse').addClass('btn-outline-secondary');
+                            return;
+                        }
+
+
+                        list = response.courses;
+                        $('#course').empty();
+                        for (var i = 0; i < list.length; i++) {
+                            var course = list[i];
+                            $('#course').append('<option value="' + course[0] + '">' + course[1] + ' ' + course[2] + ' ' + shorten(course[3]) + ' (' + hideifnull(course[8]) + ' ' + (course[10]) + ' ' + hideifnulltime(course[11] + '~' + course[12]) + ')</option>');
+                        }
+
+                        $('#course').css('vertical-align', 'top');
+                        $('#course').removeAttr('disabled');
+                        $('#addCourse').removeAttr('disabled');
+                        $('#addCourse').removeClass('btn-outline-secondary');
+                        $('#addCourse').addClass('btn-outline-primary');
+                    } else {
+                        console.log("ERROR");
+                        showAlert("Something went wrong...", false);
+                    }
+                },
+                error: function(error) {
+                    console.log(error);
+                    showAlert("There seems to be something wrong wit the server. Try again later!", false);
+                }
+            });
+
+        });
+    }
+
+
+    function delete_course(crn) {
+        console.log("delete course called");
+        $.ajax({
+            url: '/deletecourse',
+            data: 'crn=' + crn,
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                if (response.success == "yes") {
+                    console.log("ajax success ok");
+                    showAlert("Course Deleted!", true);
+                    load_courses();
+                } else {
+                    console.log("ERROR");
+                    showAlert("Something went wrong...", false);
+                }
+            },
+            error: function(error) {
+                console.log(error);
+                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+            }
+        });
+    }
+
+
+
+    function add_course(crn) {
+        console.log("add course called");
+        $.ajax({
+            url: '/addcoursebycrn',
+            data: 'crn=' + crn,
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                if (response.success == "yes") {
+                    console.log("ajax success ok");
+                    showAlert("Course Added", true);
+                    $('#course').html('<option value="">Please select course</option>')
+                    $('#course').prop('disabled', true);
+                    $('#addCourse').prop('disabled', true);
+                    $('#addCourse').removeClass('btn-outline-primary');
+                    $('#addCourse').addClass('btn-outline-secondary');
+                    $('#major').val($("#major option:first").val());
+                    load_courses();
+                } else {
+                    console.log("ERROR");
+                    showAlert("Something went wrong...", false);
+                }
+            },
+            error: function(error) {
+                console.log(error);
+                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+            }
+        });
+    }
+
+
+
+    function load_courses() {
+        $.ajax({
+            url: '/getusercourses',
+            data: '',
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+                if (response.success == "yes") {
+                    console.log("ajax success ok");
+                    $('#course-list').empty(); //clean old course
+                    if (response.courses == null || response.courses.length == 0) {
+                        console.log("courses is either null or length is 0");
+                        return;
+                    }
+
+
+                    list = response.courses;
+                    for (var i = 0; i < list.length; i++) {
+                        console.log(i + " " + list[i][0]);
+                        var course = list[i];
+                        var course_template = '<li class="list-group-item flex-column align-items-start">' +
+                            '<div class="d-flex w-100 justify-content-between">' +
+                            ' <h5 class="mb-1">%department% %course_num% : %course_name% <strong>%type%</strong></h5>' +
+                            '  <small class="crn-text">%crn%</small>' +
+                            '  </div>' +
+                            '    <p class="mb-1">%desc%</p>' +
+                            '      <small>%instructor% | %building% %room% | %day% %time% - %time2%</small>' +
+                            '      <i class="material-icons delete-course">delete</i>'
+                        '   </li>';
+                        course_template = course_template.replace("%crn%", course[0]).
+                        replace("%department%", course[1]).
+                        replace("%course_num%", course[2]).
+                        replace("%course_name%", course[3]).
+                        replace("%type%", course[4]).
+                        replace("%building%", course[5]).
+                        replace("%room%", course[6]).
+                        replace("%desc%", course[7]).
+                        replace("%instructor%", course[8]).
+                        replace("%day%", course[10]).
+                        replace("%time%", course[11]).
+                        replace("%time2%", course[12]);
+                        $('#course-list').append(course_template);
+                    }
+                    $('#course-list').children('li').each(function() {
+                        $(this).children('i').click(function(event) {
+                            event.preventDefault(); //prevent the default action 
+                            var course = $(this).parent();
+                            var crn = course.find('.crn-text').text();
+                            console.log("deleting a course by crn " + crn);
+                            delete_course(crn);
+                        });
+                    });
+                } else {
+                    console.log("ERROR");
+                    showAlert("Something went wrong...", false);
+                }
+            },
+            error: function(error) {
+                console.log(error);
+                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+            }
+        });
+    }
+
+</script>
+
+
+{% endblock %}

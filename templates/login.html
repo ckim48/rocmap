@@ -1,0 +1,73 @@
+{% extends "core.html" %}
+{% block title %}Index{% endblock %}
+{% block body %}
+
+
+<style>
+html {
+  background: url("/static/images/background-rushree.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+  background: none;
+  color: #FFF;
+}
+.container {
+  text-align: center;
+  width: 400px;
+  margin-top: 150px;
+}
+.material-icons {
+  vertical-align: middle;
+}
+</style>
+
+{% if authFailure %}
+<div class="fixed-top">
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <i class="material-icons">info_outline</i> {{ authFailure }}
+</div>
+</div>
+{% endif %}
+<div class="container">
+
+  <h1>UR map</h1>
+  <p><strong>Find your lectures and classmates easily!</strong></p>
+
+  <form name="form1" method="post" action="{{ url_for('authenticate') }}">
+
+    <div class="form-group">
+      <label for="Email1">Email address</label>
+      <input type="email" class="form-control" id="Email1" name="usr_email" aria-describedby="emailHelp" placeholder="Enter email" required>
+      <small id="emailHelp" class="form-text text-muted">We"ll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+      <label for="Password1">Password</label>
+      <input type="password" class="form-control" id="Password1" name="usr_password" placeholder="Password" required>
+    </div>
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="checkbox" id="stayloggedin" name="chk_box" class="form-check-input" value="unchecked"> Stay Logged In</label>
+      </div>
+
+
+      <fieldset class="form-group">
+        <input class="btn btn-success" type="submit" name="submit" value="Log in!">
+
+      </fieldset>
+
+      <p><a href="{{ url_for('register') }}">Not a menber yet?</a></p>
+
+    </form>
+
+
+
+  </div>
+  {% endblock %}

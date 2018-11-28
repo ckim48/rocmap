@@ -1,0 +1,14 @@
+{% extends "core.html" %}
+{% block title %}Error{% endblock %}
+{% block body %}
+<div class="container-fluid" style="height: 100vh;">
+    <div class="row justify-content-center align-items-center" style="height: 100%">
+        <div class="col-auto mr-auto ml-auto text-center">
+          <h1 style="font-size: 2.5rem;margin-bottom: 16px;">Something happened... in our server</h1>
+          <a href="{{ url_for('index') }}" class="btn btn-primary" role="button">Home</a>
+          <a href="javascript:history.back();" class="btn btn-outline-dark" role="button">Go back</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

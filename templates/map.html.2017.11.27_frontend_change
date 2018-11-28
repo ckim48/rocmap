@@ -1,0 +1,709 @@
+{% extends "core.html" %}
+{% block title %}Index{% endblock %}
+{% block body %}
+<style>
+    html, body {
+        font-family: Arial, sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: calc(100% - 54px);
+
+    }
+
+    #log-container {
+        position: absolute;
+        top: 10px;
+        left: 80%;
+        z-index: 5;
+        height: 10%;
+        padding: 5px;
+        text-align: center;
+    }
+
+    #search-panel {
+        position: absolute;
+        top: 40px;
+        left: 65%;
+        z-index: 5;
+        height: 50%;
+        background-color: #fff;
+        padding: 5px;
+        text-align: center;
+    }
+
+    #pano {
+        width: 200px;
+        height: 200px;
+    }
+
+    .class-word {
+        text-align: center;
+    }
+
+    .vertical-alignment-helper {
+        display: table;
+        height: 100%;
+        width: 100%;
+        pointer-events: none; /* This makes sure that we can still click outside of the modal to close it */
+    }
+
+    .vertical-align-center {
+        /* To center vertically */
+        display: table-cell;
+        vertical-align: middle;
+        pointer-events: none;
+    }
+
+    .modal-content {
+        /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+        width: inherit;
+        max-width: inherit; /* For Bootstrap 4 - to avoid the modal window stretching full width */
+        height: inherit;
+        /* To center horizontally */
+        margin: 0 auto;
+        pointer-events: all;
+    }
+
+    select:disabled {
+        cursor: not-allowed;
+        pointer-events: all !important;
+    }
+
+/* Building name autocomplete by JING SUN 2017.11.18 */
+    .ui-autocomplete.ui-widget {
+        font-family: Verdana, Arial, sans-serif;
+        font-size: 14px;
+    }
+/* END OF Building name autocomplete by JING SUN 2017.11.18 */
+
+/* Building information by JING SUN 2017.11.18 */
+    #hidden_info {
+        /*TEST 2*/
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 23%;
+        width: 50%;
+        z-index: 999;
+        /*END OF TEST 2*/
+    }
+
+    .card-header {
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .card-block {
+        padding: 10px;
+        font-size: 14px;
+        color: white;
+    }
+
+    .table {
+    	font-size: 14px;
+    }
+/* END OF Building information by JING SUN 2017.11.18 */
+</style>
+
+<nav class="navbar navbar-dark bg-dark">
+
+
+    <!-- add logout button here -->
+    <div>
+        {% if isLogined %}
+        <form action="{{ url_for('profile') }}" style="display: inline-block;">
+            <button class="btn btn-success" type="submit">Profile</button>
+        </form>
+        <form action="{{ url_for('logout') }}" style="display: inline-block;">
+            <button class="btn btn-primary" type="submit">Logout</button>
+        </form>
+
+        {% else %}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">Login</button>
+
+        <!-- Login Modal by Seungho 2017.11.12 -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+             aria-hidden="true">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                            <div class="alert-top">
+                            </div>
+                            <form id="loginForm" name="loginForm" style="margin: 18px;">
+                                <div class="form-group">
+                                    <label for="Email1">Email address</label>
+                                    <input type="email" class="form-control" id="Email1" name="usr_email"
+                                           aria-describedby="emailHelp" placeholder="Enter email" required>
+                                    <small id="emailHelp" class="form-text text-muted">We"ll never share your email with
+                                        anyone else.
+                                    </small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Password">Password</label>
+                                    <input type="password" class="form-control" id="Password" name="usr_password"
+                                           placeholder="Password" required>
+                                </div>
+                                <div class="text-right">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" id="stayloggedin" name="chk_box"
+                                                   class="form-check-input"
+                                                   value="unchecked"> Stay Logged In</label>
+                                    </div>
+                                    <p><a href="" data-toggle="modal" data-target="#registerModal" data-dismiss="modal">Not
+                                        a member yet?</a></p>
+
+
+                                    <fieldset class="form-group">
+                                        <input class="btn btn-success" type="submit" id="auth" name="submit"
+                                               value="Log in!">
+                                    </fieldset>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- Register Modal by Seungho 2017.11.15 -->
+        <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel"
+             aria-hidden="true">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                            <div class="alert-top">
+                            </div>
+                            <form id="registerForm" name="registerForm" style="margin: 18px;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="usr">E-mail</label>
+                                        <input type="text" class="form-control" id="usr" placeholder="E-mail"
+                                               name="email" required></div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="pwd">Password</label>
+                                        <input type="password" class="form-control" id="pwd" placeholder="Password"
+                                               name="password" required></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="nm">Name</label>
+                                        <input type="text" class="form-control" id="nm" placeholder="Name" name="name"
+                                               required></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="school-select">School</label>
+                                        <select class="form-control" id="school-select" placholder="School"
+                                                name="school" required>
+                                            <option value="">Select School</option>
+                                            <option value="artsandscience">School of Arts and Sciences</option>
+                                            <option value="engineering">Hajim School of Engineering and Applied
+                                                Sciences
+                                            </option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="sub">Major</label>
+                                        <select id="major" class="form-control" id="sub" name="major" required disabled>
+                                            <option value="">Please select your school</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="buttonHolder">
+                                    <button class="btn btn-primary" type="submit">Sign up</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <form class="form-inline">
+        <input id="address" class="form-control mr-sm-2" type="textbox" value="Rushrhees Library">
+        <input id="submit" class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search">
+    </form>
+</nav>
+
+
+<div id="map"></div>
+
+<!-- Building information by JING SUN 2017.11.18 -->
+<div class="card" id="hidden_info">
+    <input type="button" id="close" value="X" class="btn btn-primary float-right border-0"></input>
+    <div class="card-header text-center bg-primary"><span id="bdg"></span> BUILDING</div>
+    <div class="card-block bg-secondary">COURSE INFORMATION</div>
+    <table class="table table-hover">
+	<thead>
+	    <tr>
+    		<th>Number</th>
+    		<th>Name</th>
+    		<th>Instructor</th>
+	    </tr>
+	<thead>
+	<tbody id="crs"></tbody>
+</div>
+<!-- END OF Building information by JING SUN 2017.11.18 -->
+
+<!-- Building Name autocomplete by JING SUN 2017.11.18-->
+<script type="text/javascript">
+    $(document).ready(function(){
+        var a_Tags = [
+            'Susan B. Anthony Hall',
+            'Douglass Dining Hall',
+            'Wilson Commons',
+            'Rettner Hall',
+            'Morey Hall',
+            'Rush Rhees Library',
+            'Morey Hall',
+            'Strong Auditorium',
+            'Meliora Hall',
+            'Dewey Hall',
+            'Schlegel Hall',
+            'Harkness Hall',
+            'Gavett Hall',
+            'Wegmans Hall',
+            'Goergen Hall',
+            'Hutchison Hall',
+            'Computer Studies Building',
+            'Carlson Library',
+            'Institute of Optics'
+        ];
+        $('#address').autocomplete({
+            source: a_Tags
+        });
+    });
+</script>
+<!-- END OF Building Name autocomplete by JING SUN 2017.11.18-->
+
+<!-- Login/Register Ajax Seungho 2017.11.12/2017.11.15 -->
+<script>
+
+    $('#loginForm').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/authenticateAJAX',
+            data: $('#loginForm').serialize(),
+            type: 'POST',
+            success: function (response) {
+                console.log(response);
+                var result = JSON.parse(response);
+                if (result["authOK"] === "OK") {
+                    console.log("OK");
+                    showAlert(result["message"], true);
+
+                    if (result["expires"].length == 0) {
+                        Cookies.set('session_key', result["cookie"]);
+                    } else {
+                        Cookies.set('session_key', result["cookie"], {expires: parseInt(result["expires"])});
+                    }
+                    window.location.reload();
+                } else if (result["authOK"] === "NO") {
+                    console.log("ERROR");
+                    showAlert(result["message"], false);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+            }
+        });
+    });
+
+    $('#registerForm').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/registerAJAX',
+            data: $('#registerForm').serialize(),
+            type: 'POST',
+            success: function (response) {
+                console.log(response);
+                var result = JSON.parse(response);
+                console.log(result);
+                if (result["regOK"] === "OK") {
+                    console.log("regOK");
+                    $('#registerModal').modal('hide');
+                    $('#loginModal').modal('show');
+                    showAlert(result["message"], true);
+                } else if (result["regOK"] === "NO") {
+                    console.log("ERROR");
+                    showAlert(result["message"], false);
+                }
+            }
+            ,
+            error: function (error) {
+                console.log(error);
+                showAlert("There seems to be something wrong wit the server. Try again later!", false);
+            }
+        });
+    });
+</script>
+
+<!-- School Major selection javascript. Seungho 2017.11.01 -->
+<script>
+    $(document).ready(function () {
+        $('#school-select').on('change', function () {
+            var engMajors = ["Audio and Music Engineering", "Biomedical Engineering", "Chemical Engineering", "Computer Science", "Data Science", "Electrical and Computer Engineering", "Geomechanics", "Interdepartmental Engineering", "Engineering Science", "Mechanical Engineering", "Optical Engineering", "Optics", "Other"];
+            var otherMajors = ["African and African American Studies", "American Sign Language", "American Studies", "Anthropology", "Applied Mathematics", "Archaeology, Technology and Historical Structures", "Art History", "Biological Sciences", "Biology", "Brain and Cognitive Sciences", "Business", "Chemistry", "Classics", "Comparative Literature", "Dance", "Data Science", "Digital Media Studies", "East Asian Studies", "Economics", "English", "Environmental Science", "Environmental Studies", "Epidemiology", "Film and Media Studies", "Financial Economics", "French", "Gender, Sexuality, and Women\'s Studies", "Geological Sciences", "Geomechanics", "German", "Health, Behavior, and Society", "Health Policy", "History", "Interdepartmental Studies", "International Relations", "Japanese", "Linguistics", "Mathematics", "Mathematics and Statistics", "Music", "Philosophy", "Physics", "Political Science", "Psychology", "Bioethics", "Environmental Health", "Religion", "Russian", "Russian Studies", "Spanish", "Statistics", "Studio Arts", "Other"];
+            if (this.value == 'artsandscience') {
+                $('#major').html('<option value="">Select Major</option>');
+                var x;
+                for (i = 0; i < otherMajors.length; i++) {
+                    $('#major').append("<option>" + otherMajors[i] + "</option>");
+                }
+                $('#major').removeAttr('disabled');
+            } else if (this.value == 'engineering') {
+                $('#major').html('<option value="">Select Major</option>');
+                var x;
+                for (i = 0; i < engMajors.length; i++) {
+                    $('#major').append("<option>" + engMajors[i] + "</option>");
+                }
+                $('#major').removeAttr('disabled');
+            } else if (this.value == 'other') {
+                $('#major').html('<option value="">Select Major</option>');
+                $('#major').append("<option>Other</option>");
+                $('#major').removeAttr('disabled');
+            } else {
+                $('#major').html('<option value="">Please select your school</option>');
+                $('#major').attr('disabled', 'disabled');
+            }
+        })
+
+    });
+</script>
+
+<script>
+    var temp = {lat: 43.123050300, lng: -77.626940300};
+    var marker;
+    var map;
+    var defaultIcon;
+    var highlightedIcon;
+    var largeInfowindow;
+    var pos;
+    var time;
+
+    function myMap() {
+        var mapOptions = {
+            center: new google.maps.LatLng(43.123050300, -77.626940300),
+            zoom: 17,
+            mapTypeId: google.maps.MapTypeId.roadmap
+        }
+
+        map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        defaultIcon = makeMarkerIcon('0091ff');
+        highlightedIcon = makeMarkerIcon('FFFF24');
+        var geocoder = new google.maps.Geocoder();
+        largeInfowindow = new google.maps.InfoWindow();
+
+
+        document.getElementById('submit').addEventListener('click', function () {
+            if (marker) {
+                marker.setMap(null);
+            }
+            geocodeAddress(geocoder, map);
+
+
+        });
+
+        $(document).ready(function () {
+            $('.form-inline').submit(function (e) {
+                e.preventDefault();
+                if (marker) {
+                    marker.setMap(null);
+                }
+                geocodeAddress(geocoder, map);
+                return false;
+            });
+        });
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+            }, function () {
+                showAlert("Sorry we are not allowed to get your location.", false);
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            alert("Your browser does not support html5");
+        }
+
+
+    }
+
+    function geocodeAddress(geocoder, resultsMap) {
+        var address = document.getElementById('address').value + 'Rochester';
+        geocoder.geocode({'address': address}, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                resultsMap.setCenter(results[0].geometry.location);
+                resultsMap.setZoom(18);
+                temp.lat = results[0].geometry.location.lat();
+                temp.lng = results[0].geometry.location.lng();
+                marker = new google.maps.Marker({
+                    position: temp,
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    title: 'Rushrhees',
+                    icon: defaultIcon
+                    //	id: i
+                });
+                marker.addListener('mouseover', function () {
+                    this.setIcon(highlightedIcon);
+                });
+
+                marker.addListener('mouseout', function () {
+                    this.setIcon(defaultIcon);
+                });
+
+                marker.addListener('click', function () {
+                    populateInfoWindow(this, largeInfowindow);
+                });
+
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+        calculate_time([pos], [address], "WALKING");
+    }
+
+    function populateInfoWindow(marker, infowindow) {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+            // Clear the infowindow content to give the streetview time to load.
+            infowindow.setContent('');
+            infowindow.marker = marker;
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function () {
+                infowindow.marker = null;
+            });
+            var streetViewService = new google.maps.StreetViewService();
+            var radius = 50;
+            // In case the status is OK, which means the pano was found, compute the
+            // position of the streetview image, then calculate the heading, then get a
+            // panorama from that and set the options
+            function getStreetView(data, status) {
+                if (status == google.maps.StreetViewStatus.OK) {
+                    var nearStreetViewLocation = data.location.latLng;
+
+                    // this is used for create th info window on the map
+                    var contentString = '<div class=\"card text-black bg-light\"> <div class=\"card-body\">'+
+                    '<div>' +'<h1><strong>' + marker.title + '</strong></h1></div>'+'<div><blockquote class="blockquote"> we get it for you </div><div id="pano"></div></blockquote>' +
+                        '<div> it takes ' + time + ' walk for you to get there</div>' +
+                        '<div><input type=\"button\"  class=\"btn btn-secondary btn-sm\" value=\"View Route\" onclick =' +
+                        '\"displayDirections(&quot;' + temp + '&quot;);\"></input></div>' +
+                        '<div> CSC 160 : web programming</div>' +
+                        '<div><button type=\"button\" class=\"btn btn-info btn-sm\" id="WEGMN" >view all Courses!</button></div>'
+                        + '</div>'
+                        + '</div>'
+                    var heading = google.maps.geometry.spherical.computeHeading(
+                        nearStreetViewLocation, marker.position);
+                    infowindow.setContent(contentString);
+                    var panoramaOptions = {
+                        position: nearStreetViewLocation,
+                        pov: {
+                            heading: heading,
+                            pitch: 30
+                        }
+                    };
+                    var panorama = new google.maps.StreetViewPanorama(
+                        document.getElementById('pano'), panoramaOptions);
+                    //	alert('happan');
+
+                    // Building information by JING SUN 2017.11.18
+                    $(document).ready(function () {
+                        $('#WEGMN').on('click', function () {
+                            infowindow.close();
+                            var bd = this.id;
+                            $.ajax({
+                                url: '/bdInfo',
+                                type: 'POST',
+                                data: JSON.stringify({'name': bd}),
+                                contentType: 'application/json;charset=UTF-8',
+                                success: function (data) {
+                                    $("#hidden_info").show();
+                                    console.log("SUCCESS!");
+                                    console.log(data);
+                                    $("#bdg").text(data.value_1);
+                                //    $("#crs").text(data.value_2);
+
+                 				    var j=0;
+                				    while(data.value_2[j]){
+                                                	var row = $('<tr>');
+                					for(var i=0; i<3; i++){
+                					    row.append($('<td>').html(data.value_2[j][i]));
+                					}
+                					$('#crs').append(row);
+                					j = j+1;
+                				    }
+                                    $("#close").click(function () {
+                                        $("#hidden_info").hide();
+                                        data = '';
+                                        $("#bdg").text('');
+                                        $('#crs').text('');
+                                    });
+                				},
+                                error: function (error) {
+                                    console.log(error);
+                                }
+                            });
+
+
+                        });
+                    });
+
+                    function clickOther(e) {
+                        thisObj = e.target ? e.target : event.srcElement;
+                        if (thisObj.id == "hidden_info") return;
+                        else {
+                            $("#hidden_info").hide();
+                        }
+                    }
+
+                    function close_info() {
+                        document.getElementById('hidden_info').hide();
+                    }
+
+                    //END OF Building information by JING SUN 2017.11.18
+
+                }
+                else {
+                    infowindow.setContent('<div>' + marker.title + '</div>' +
+                        '<div>No Street View Found</div>');
+                }
+            }
+
+            // Use streetview service to get the closest streetview image within
+            // 50 meters of the markers position
+            streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+            // Open the infowindow on the correct marker.
+            infowindow.open(map, marker);
+        }
+    }
+
+    function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+            '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21, 34));
+        return markerImage;
+
+    }
+
+    function calculate_time(origins, destination, travelMode) {
+        var service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+            {
+                origins: origins,
+                destinations: destination,
+                travelMode: travelMode,
+                unitSystem: google.maps.UnitSystem.IMPERIAL,
+            }, function (response, status) {
+
+                if (status !== google.maps.DistanceMatrixStatus.OK) {
+
+                    window.alert('Error was: ' + status);
+
+                } else {
+
+                    show_result(response);
+
+                }
+
+            });
+    }
+
+    function show_result(response) {
+        time = response.rows[0].elements[0].duration.text;
+    }
+
+    function displayDirections(destination) {
+
+        var directionsService = new google.maps.DirectionsService;
+
+        // Get mode again from the user entered value.
+
+        var mode = 'WALKING';
+
+        directionsService.route({
+
+            // The origin is the passed in marker's position.
+
+            origin: pos,
+
+            // The destination is user entered address.
+
+            destination: temp,
+
+            travelMode: google.maps.TravelMode[mode]
+
+        }, function (response, status) {
+
+            if (status === google.maps.DirectionsStatus.OK) {
+
+                var directionsDisplay = new google.maps.DirectionsRenderer({
+
+                    map: map,
+
+                    directions: response,
+
+                    draggable: true,
+
+                    polylineOptions: {
+
+                        strokeColor: 'green'
+
+                    }
+
+                });
+
+            } else {
+
+                window.alert('Directions request failed due to ' + status);
+
+            }
+
+        });
+
+    }
+
+</script>
+
+
+<script async defer
+
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlDn1p_hc7UfF1sfKEdHaz_0fnyJZIDk0&callback=myMap">
+
+</script>
+{% endblock %}

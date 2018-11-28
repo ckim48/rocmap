@@ -1,0 +1,457 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Profile</title>
+        <style>
+            .card {
+                width: 100%;
+                position: relative;
+                left: 50%;
+                margin-top: 20px;
+                padding: 0px;
+                background-color: rgba(214, 224, 226, 0.2);
+                -webkit-border-top-left-radius:5px;
+                -moz-border-top-left-radius:5px;
+                border-top-left-radius:5px;
+                -webkit-border-top-right-radius:5px;
+                -moz-border-top-right-radius:5px;
+                border-top-right-radius:5px;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            .card.hovercard {
+                position: relative;
+                padding-top: 0;
+                overflow: hidden;
+                text-align: center;
+                background-color: #fff;
+                background-color: rgba(255, 255, 255, 1);
+            }
+            .card.hovercard .card-background {
+                height: 180px;
+            }
+            .card-background img {
+                -webkit-filter: blur(25px);
+                -moz-filter: blur(25px);
+                -o-filter: blur(25px);
+                -ms-filter: blur(25px);
+                filter: blur(25px);
+                margin-left: -100px;
+                margin-top: -200px;
+                min-width: 130%;
+            }
+            .card.hovercard .useravatar {
+                position: absolute;
+                top: 15px;
+                left: 0;
+                right: 0;
+            }
+            .card.hovercard .useravatar img {
+                width: 100px;
+                height: 100px;
+                max-width: 100px;
+                max-height: 100px;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                border-radius: 50%;
+                border: 5px solid rgba(255, 255, 255, 0.5);
+            }
+            .card.hovercard .card-info  {
+                position: absolute;
+                bottom: 34px;
+                left: 0;
+                right: 0;
+            }      
+            .card.hovercard .card-info .card-title {
+                padding:0 10px;
+                font-size: 20px;
+                line-height: 1;
+                color: #262626;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+            }       
+            .card.hovercard .card-info-bio  {
+                position: absolute;
+                bottom: 14px;
+                left: 0;
+                right: 0;
+            }       
+			
+			#card-Edit  {
+                position: absolute;
+                upper: 54px;
+                right: 10px;
+            }      
+			
+            .card.hovercard .card-info .card-title-bio {
+                padding:0 10px;
+                font-size: 20px;
+                line-height: 1;
+                color: #262626;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+            }
+            .card.hovercard .card-info {
+                overflow: hidden;
+                font-size: 12px;
+                line-height: 20px;
+                color: #737373;
+                text-overflow: ellipsis;
+            }
+            .card.hovercard .bottom {
+                padding: 0 20px;
+                margin-bottom: 17px;
+            }
+            .courses {
+                display: inline-block;
+                width: 100%;
+                position: relative;
+                left: 50%;
+                margin-top: 6px;
+                margin-bottom: 0;
+                padding: 10px 10px 10px 20px;
+                background-color: #F7F9F9;
+            }
+            .card-course {
+                width: 100%;
+                position: relative;
+                left: 50%;
+                margin-top: 0;
+                padding: padding: 10px 10px 10px 20px;
+                border-radius: 5px;
+            }
+            .course-title {
+                float: left;
+                color: #262626;   
+            }
+            .add-icon {
+                padding: 0 10px 0 0;
+                float: right;  
+            }
+            .remove-icon {
+                float: right;  
+            }
+            a:hover {
+                color: #651296;
+                text-decoration: none;
+            }
+        
+            /* Set a style for all buttons */
+            button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 14px 20px;
+                margin: 8px 0;
+                border: none;
+                cursor: pointer;
+                width: 100%;
+            }
+
+            /* Extra styles for the cancel button */
+            .cancelbtn {
+                padding: 14px 20px;
+                background-color: #f44336;
+            }
+
+            /* Float cancel and signup buttons and add an equal width */
+            .cancelbtn,.addbtn {float:left;width:50%}
+
+            /* Add padding to container elements */
+            .container {
+                padding: 20px;
+            }
+
+            /* The Modal (background) */
+            .modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+                padding-top: 60px;
+            }
+
+            /* Modal Content/Box */
+            .modal-content {
+                background-color: #fefefe;
+                margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+                border: 1px solid #888;
+                width: 80%; /* Could be more or less, depending on screen size */
+            }
+
+            /* The Close Button (x) */
+            .close {
+                position: absolute;
+                right: 35px;
+                top: 15px;
+                color: #000;
+                font-size: 40px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: red;
+                cursor: pointer;
+            }
+
+            /* Clear floats */
+            .clearfix::after {
+                content: "";
+                clear: both;
+                display: table;
+            }
+
+            /* Change styles for cancel button and signup button on extra small screens */
+            @media screen and (max-width: 300px) {
+                .cancelbtn, .addbtn {
+                   width: 100%;
+                }
+            }
+			
+            </style>
+	
+    <!-- Bootstrap CSS -->
+    </head>
+    <body> 
+        <div class="col-lg-6 col-sm-6">
+            <div class="card hovercard">
+                <div class="card-background">
+                    <img class="card-bkimg" src="icon-profile.png"
+                    >
+                </div>
+                <div class="useravatar">
+                    <img src="icon-profile.png">
+                </div>
+                {% if user_name %}
+                <div class="card-info"> <span class="card-title">{{ user_name }}</span>
+                </div>
+				
+				<div id="card-Edit" onclick="document.getElementById('Edit-prof').style.display='block'"> <span class="card-title">Edit</span>
+                </div>
+
+
+                <div class="card-info-bio"> <span class="card-title-bio"><i>{{user_bio}}</i></span>
+                </div>
+                {% endif %}
+              </div>
+        </div>
+     
+        <div class="col-lg-6 col-sm-6">            
+            <div id="accordion" role="tablist">
+                <div class="courses">       
+                    <h5 class="mb-0">
+                        <span class="course-title">Courses</span>  
+                        <div class="add-icon">
+                            <i class="material-icons" onclick="document.getElementById('id01').style.display='block'">add_circle</i>
+                        </div> 
+                    </h5>
+                </div>	
+                <div id="show-all-course"></div>
+            </div>
+        </div>
+        
+    
+
+    <div id="id01" class="modal">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">×</span>
+        <form class="modal-content animate">
+            <div class="container">
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">School</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                        <option>Arts, Sciences and Engineering</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Department</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                        <option>Computer Science</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Course</label>
+                    <select class="form-control" id="exampleFormControlSelect1">
+                        <option>CSC440 DATA MINING</option>
+                        <option>2</option>
+                    </select>
+                </div>
+                <div class="clearfix">
+                    <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+                    <button type="submit" class="addbtn">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+	
+	
+    <div id="Edit-prof" class="modal">
+        <span onclick="document.getElementById('Edit-prof').style.display='none'" class="close" title="Close Modal">×</span>
+        <form class="modal-content animate" action="{{url_for('edit_profile')}}" method="post">
+            <div class="container">
+                <div class="form-group">
+                    <label class="custom-file">
+					  <input type="file" id="file2" class="custom-file-input">
+					  <span class="custom-file-control"></span>
+					</label>
+                </div>
+                <div class="form-group">
+                    <label for="user-name">Username</label>
+						<input type="text" class="form-control" name="user_name" id="user-name" placeholder="username" required>
+
+					
+					
+                </div>
+                <div class="form-group">
+                    <label for="user-bio">Bio</label>
+						<input type="text" class="form-control" name="user_bio" id="user-bio" placeholder="Brief intro about yourself." required>
+
+					
+					
+                </div>
+                <div class="clearfix">
+                    <button type="button" onclick="document.getElementById('Edit-prof').style.display='none'" class="cancelbtn">Cancel</button>
+                   
+                        <button type="submit" class="addbtn">Add</button>
+                    
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById('id01');
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+		
+	var Edit_prof = document.getElementById('Edit-prof');
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == Edit_prof) {
+                Edit_prof.style.display = "none";
+            }
+        };
+		var course_name = ['CSC 412', 'CSC 440', 'CSC 442'];
+		var course_discription = ['Human Computer Interaction', 'Data Mining', 'Artificial Intelligence']
+		var show_course = new Array();
+		
+		function create_show_course(course_name, course_discription) {
+			if(course_name.length == 0 || course_discription.length == 0){
+				show_course = 'You have not choose any course';
+			}
+			show_course = new Array();
+			for(i=0; i<course_name.length; i++){
+				temp = '<div class="card-course"> ' +
+						  '<div class="card-header" role="tab" id="heading'+ i + '"><h5 class="mb-0">'+
+								'<a class="collapsed" data-toggle="collapse" href="#collapse'+i+'" aria-expanded="false" aria-controls="collapse'+i+'"><span class="course-name">'+
+								course_name[i]+
+								'</span>'+
+								'<div class="remove-icon">'+
+									'<i class="material-icons" id="rmv-'+i+'" onclick="delete_course('+i+')">delete</i>'+
+								'</div>'+
+								'</a>'+
+								'</h5>'+
+								'</div>'+
+								'<div id="collapse'+i+'" class="collapse" role="tabpanel" aria-labelledby="heading'+i+'" data-parent="#accordion">'+
+								'<div class="card-body">'+
+								course_discription[i]+
+								'</div>'+
+								'</div>'+
+								'</div>';
+				show_course.push(temp);
+			}
+			return show_course;
+		}
+		
+		function display(show_course){
+			var result = '';
+			for (i=0; i<show_course.length; i++){
+				result = result + show_course[i];
+			}
+			return result;
+		}
+		var show_course = create_show_course(course_name, course_discription);
+		var display_course = display(show_course);
+		
+		
+		document.getElementById("show-all-course").innerHTML = display_course;
+		
+		
+		function delete_course(i){
+			course_name.splice(i,1);
+			course_discription.splice(i,1);
+			show_course = create_show_course(course_name, course_discription);
+			display_course = display(show_course);
+			document.getElementById("show-all-course").innerHTML = display_course;
+		}
+		
+    </script>
+
+    <script>
+    $('#loginForm').submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/profileAjax',
+            data: $('#loginForm').serialize(),
+            type: 'POST',
+            success: function (response) {
+                console.log(response);
+                var result = JSON.parse(response);
+                console.log(result);
+                console.log(result.authOk);
+                console.log(result["authOk"]);
+                if (result["authOK"] === "OK"){
+                  console.log("OK");
+                  if (result["expires"].length == 0){
+                    Cookies.set('session_key', result["cookie"]);
+                  } else {
+                    Cookies.set('session_key', result["cookie"], { expires: parseInt(result["expires"])});
+                  }
+                  window.location.reload();
+                } else if (result["authOK"] === "NO"){
+                  console.log("ERROR");
+                  $('#alert-top').html(
+                    "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+                    "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+                    "  <span aria-hidden='true'>&times;</span>" +
+                    "</button>" +
+                    "<i class='material-icons'>info_outline</i><div id='alert_message'></div>" +
+                    "</div>");
+                  $('#alert_message').html(result["message"]);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+                $('#alert-top').html(
+                  "<div class='alert alert-danger alert-dismissible fade show' role='alert'>" +
+                  "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+                  "  <span aria-hidden='true'>&times;</span>" +
+                  "</button>" +
+                  "<i class='material-icons'>info_outline</i><div id='alert_message'>There seems to be something wrong wit the server. Try again later!</div>" +
+                  "</div>");
+                $('#alert_message').html(error["message"]);
+            }
+        });
+    });
+
+
+</script>
+  </body>
+</html>

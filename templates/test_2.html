@@ -1,0 +1,87 @@
+{% extends "core.html" %}
+{% block title %}Index{% endblock %}
+{% block body %}
+<head>
+	<title>Test_bdInfo</title>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('p').on('click', function(){
+//				var bd = new Object();
+//				bd.name = $(this).attr('id');
+//				bd.name = $(this).val();
+				var bd = this.id;
+/*				$.ajax({
+					url: '/bdInfo',
+					type: 'POST',
+					data: JSON.stringify({'name': bd}),
+					contentType: 'application/json;charset=UTF-8',
+					success: function(data){
+//						var value_1 = '{{ value_1 }}';
+//						var value_2 = '{{ value_2 }}';
+//						alert(value_1);
+						$('#bdg').text(data.value_1);
+//						$('#crs').text(data.value_2);
+						var j=0;
+						while(data.value_2[j]){
+							var row = $('<tr>');
+							for(var i=0; i<3; i++){
+								row.append($('<td>').html(data.value_2[j][i]));
+							}
+							$('#crs').append(row);
+							j=j+1;
+						}
+						
+						
+						console.log("SUCCESS!");
+						console.log(data);
+						console.log(data.value_2[0]);
+						console.log(data.value_2[1]);
+						console.log(data.value_2[2]);
+						console.log(data.value_2[3]);
+						console.log(data.value_2[0][0]);
+						console.log(data.value_2[1][0]);
+						console.log(data.value_2[2][0]);
+					},
+					error: function(error){
+						console.log(error);
+					}
+				});
+*/		
+//				$("#course").css("display","block");
+
+				$.get("https://cdcs.ur.rochester.edu/", function(res){
+					var data = $.parseHTML(res);
+					var data_txt = $(data).find("span[id^='rpResults_'][id$='_lblCNum']:first").text();
+					$('#SHOW').text(data_txt);
+				});
+			});
+		});
+	</script>
+</head>
+<body>
+<div class="panel panel-default" id="course">
+	<div class="panel-heading">Building: <span id="bdg"></span></div>
+	<div class="panel-body">Courses: </div>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Number</th>
+				<th>Instructor</th>
+			</tr>
+		</thead>
+		<tbody id="crs">
+		</tbody>
+	</table>
+
+	<span id="crs"></span>
+</div>
+
+<p id="WEGMN">WEGMN</p>
+<p id="GRGEN">GRGEN</p>
+<p id="DEWEY">DEWEY</p>
+<p id="SHOW"></p>
+
+</body>
+{% endblock %}

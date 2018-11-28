@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta  http-equiv="description" content="" />
+<meta http-equiv="keywords" content="" />
+<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+<meta name="format-detection" content="telephone=no,address=no">
+<title>REGISTRATION</title>
+<!--<link rel="stylesheet" href="css/register.css" type="text/css" />
+<link rel="stylesheet" href="css/common.css" type="text/css" />
+<link rel="stylesheet" href="css/reset.css" type="text/css" />-->
+<script type="text/javascript">
+
+window.onload = function() {
+	if(localStorage) {
+/*		document.getElementById("form1").addEventListener("submit", function(){
+			var user_pic = document.getElementById("add_photo").value;
+			localStorage.setItem("user_pic", user_pic);
+		});
+		var re_user_pic = localStorage.getItem("user_pic");
+		if (re_user_pic != "undefined" || re_user_pic != "null") {
+			document.getElementById("add_photo").innerHTML = re_user_pic;
+		}
+*/
+		if (localStorage.getItem("imgData") === null) {
+			bannerImage = document.getElementById("add_photo");
+//			imgData = getBase64Image(bannerImage);
+			localStorage.setItem("imgData", bannerImage);
+		}
+		else{
+			var dataImage = localStorage.getItem("imgData");
+			bannerImg = document.getElementById("add_photo");
+//			bannerImg.src = "data:image/png;base64," + dataImage;
+			bannerImg.src = dataImage;
+		}
+	}
+	else{
+		alert("Local storage undefined!");
+	}
+}
+
+/*
+function getBase64Image(img){
+	var canvas = document.createElement("canvas");
+	canvas.width = img.width;
+	canvas.height = img.height;
+
+	var ctx = canvas.getContext("2d");
+	ctx.drawImage(img, 0, 0);
+
+	var dataURL = canvas.toDataURL("image/png");
+
+	return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+*/
+
+function readURL(input){
+	if (input.files && input.files[0]){
+		var reader = new FileReader();
+
+		reader.onload = function(e){
+			$('#add_photo').attr('src', e.target.result).width(150).height(200);
+		};
+
+		reader.readAsDataURL(input.files[0]);
+	}
+}
+
+
+</script>
+
+<style type="text/css">
+	/*body*/
+*{margin:0px;padding:0px;}
+h1,h2,h3,h4,h5,ul,li{margin:0px;padding:0px;}
+.layout{max-width:640px;margin:0 auto;}
+body{font-family:microsoft yahei;font-weight:normal;}
+.left{float:left;}
+.right{float:right}
+.header{overflow:hidden;}
+.inline-block{display:inline-block;}
+/*body end*/
+
+
+/*head*/
+.background_title{background-color:#f9f9f9;height:45px;width:100%;box-shadow:0 0 3px rgba(0,0,0,0.3);}
+.rent{position:relative;padding-top:13px;}
+.rent img{position:absolute;left:11px;}
+.rent p{position:absolute;display:inline-block;text-decoration:none;}
+/*head end*/
+
+
+
+/*team*/
+.team{margin:0 5px;font-size:14px;}
+/*pic*/
+.pic{height:100px;margin:10px;}
+.add_pic{background:url(../images/7.png) no-repeat;height:51px;margin:6px;}
+.upload-input{height:100%;position:relative;opacity:0;}
+/*pic end*/
+/*team end*/
+
+</style>
+
+
+</head>
+<body>
+<div style="background-color:#eee;padding-bottom:50px;">
+<div class="layout">
+
+
+
+
+
+<!--head-->
+<div class="background_title">
+<div class="rent">
+  <a href="javascript:history.go(-1)"><img src="images/1.png"></a>
+  <p style="color:#333;font-size:18px;left:50%;margin-top:-2px;margin-left:-36px;">REGISTRATION</p>
+  <a href=" "><p style="right:14px;color:#666;font-size:14px;">FINISH</p></a>
+</div>
+</div>
+<!--head end-->
+
+
+
+
+<!--form-->
+<form id="form1" action="javascript:submit();" method="post">
+<!--team-->
+<div class="team">
+<!--pic-->
+<div class="pic">
+<div style="border-bottom:1px solid #d4d6d8;padding:8px;color:#333;ling-height:24px;">
+<p>ADD PIC</p>
+</div>
+<div class="add_pic">
+  <input class="upload-input" type="file" accept="image/*" onchange="readURL(this);"/>
+  	<img id="add_photo" src="#" alt="your image"/>
+</div>
+</div>
+<!--pic end-->
+
+</form>
+<!--form end-->
+
+
+
+
+<!--finish-->
+<div class="next header">
+<div class="background_button">
+<a href=" "><p>FINISH</p></a>
+</div>
+</div>
+<!--finish end-->
+
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,237 @@
+
+{% extends "core.html" %}
+{% block title %}Index{% endblock %}
+{% block body %}
+
+<head>
+
+<title>ROC MAP MAIN PAGE!</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+
+<style>
+html, body {
+        font-family: Arial, sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+}
+#map{
+        width: 100%;
+        height: calc(100% - 54px);
+
+}
+#log-container{
+        position: absolute;
+        top: 10px;
+        left: 80%;
+        z-index: 5;
+        height: 10%;
+        background-color: none;
+        padding: 5px;
+        text-align: center;
+}
+#search-panel{
+        position: absolute;
+        top: 40px;
+        left: 65%;
+        z-index: 5;
+        height: 50%;
+        background-color: #fff;
+        padding: 5px;
+        text-align: center;
+}
+
+#pano {
+		width: 200px;
+        height: 200px;
+}
+.class-word{
+	text-align : center;
+}
+</style>
+
+</head>
+
+<body>
+
+        <nav class="navbar navbar-dark bg-dark">
+
+
+
+                <!-- add logout button here -->
+                <div id="">
+                        <!--    <a href="{{ url_for('login') }}">Logout</a>   -->
+                        <form action="{{ url_for('logout') }}">
+                                <button class="btn btn-primary" type="submit">Logout</button>
+                        </form>
+
+                </div>
+                <form class="form-inline">
+                        <input id="address" class="form-control mr-sm-2" type="textbox" value="Rushrhees Library">
+                        <input id="submit" class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search">
+                </form>
+        </nav>
+
+        <div id="map"></div>
+
+        <script>
+		var temp = {lat: 43.123050300, lng: -77.626940300};
+		var marker;
+		var map;
+		var defaultIcon;
+		var highlightedIcon;
+		var largeInfowindow;
+
+        function myMap() {
+                var mapOptions = {
+                        center: new google.maps.LatLng(43.123050300, -77.626940300),
+                        zoom: 17,
+                        mapTypeId: google.maps.MapTypeId.roadmap
+                }
+
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+				defaultIcon = makeMarkerIcon('0091ff');
+				highlightedIcon = makeMarkerIcon('FFFF24');
+                var geocoder = new google.maps.Geocoder();
+				largeInfowindow = new google.maps.InfoWindow();
+				
+
+            				
+				document.getElementById('submit').addEventListener('click', function() {
+						if(marker){marker.setMap(null);}
+                        geocodeAddress(geocoder, map);
+						
+						
+				});
+				
+				$(document).ready(function(){
+                        $('.form-inline').submit(function (e) {
+									e.preventDefault();
+									if(marker){marker.setMap(null);}
+									geocodeAddress(geocoder, map);
+									return false;
+                                });
+                        });
+
+				
+
+
+				
+
+        }
+        function geocodeAddress(geocoder, resultsMap) {
+                var address = document.getElementById('address').value + 'Rochester';
+                geocoder.geocode({'address': address}, function(results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                                resultsMap.setCenter(results[0].geometry.location);
+                                resultsMap.setZoom(18);
+								temp.lat = results[0].geometry.location.lat();
+								temp.lng = results[0].geometry.location.lng();
+								marker = new google.maps.Marker({
+									position: temp,
+									map: map,
+									animation: google.maps.Animation.DROP,
+									title: 'Rushrhees',
+									icon: defaultIcon
+								//	id: i
+								});
+								 marker.addListener('mouseover', function() {
+									this.setIcon(highlightedIcon);
+								});
+
+								marker.addListener('mouseout', function() {
+									this.setIcon(defaultIcon);
+								});	
+
+								marker.addListener('click', function(){
+									populateInfoWindow(this, largeInfowindow);
+								});
+								
+                        } else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                        }
+                });
+        }
+		
+      function populateInfoWindow(marker, infowindow) {
+        // Check to make sure the infowindow is not already opened on this marker.
+        if (infowindow.marker != marker) {
+          // Clear the infowindow content to give the streetview time to load.
+          infowindow.setContent('');
+          infowindow.marker = marker;
+          // Make sure the marker property is cleared if the infowindow is closed.
+          infowindow.addListener('closeclick', function() {
+            infowindow.marker = null;
+          });
+          var streetViewService = new google.maps.StreetViewService();
+          var radius = 50;
+          // In case the status is OK, which means the pano was found, compute the
+          // position of the streetview image, then calculate the heading, then get a
+          // panorama from that and set the options
+          function getStreetView(data, status) {
+            if (status == google.maps.StreetViewStatus.OK) {
+              var nearStreetViewLocation = data.location.latLng;
+	      
+              // this is used for create th info window on the map
+	      var contentString = '<div>' + marker.title + 'we get it for you</div><div id="pano"></div>'+
+				  '<div> CSC 160 : web programming'+
+				  '<div class="class-word" id="class1">CSC 440 ： hello world</div>'+
+				  '<div class="class-word" id="class2">CSC 440 ： hello world</div>'+
+			          '<div class="class-word" id="class3">CSC 440 ： hello world</div>'+
+				  '<div class="class-word" id="class4">CSC 440 ： hello world</div>'+
+				  '<div class="class-word" id="class5">CSC 440 ： hello world</div>'+
+			          '<div class="class-word" id="class-more"><a href="view_all_courses.html">view all Courses!</a></div>'+
+      				  '</div>'
+
+              var heading = google.maps.geometry.spherical.computeHeading(
+                nearStreetViewLocation, marker.position);
+                infowindow.setContent(contentString);
+                var panoramaOptions = {
+                  position: nearStreetViewLocation,
+                  pov: {
+                    heading: heading,
+                    pitch: 30
+                  }
+                };
+              var panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('pano'), panoramaOptions);
+			//	alert('happan');
+            } else {
+              infowindow.setContent('<div>' + marker.title + '</div>' +
+                '<div>No Street View Found</div>');
+            }
+          }
+          // Use streetview service to get the closest streetview image within
+          // 50 meters of the markers position
+          streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+          // Open the infowindow on the correct marker.
+          infowindow.open(map, marker);
+        }
+      }
+		
+      function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+          '|40|_|%E2%80%A2',
+          new google.maps.Size(21, 34),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(10, 34),
+          new google.maps.Size(21,34));
+        return markerImage;
+
+      }
+</script>
+
+	<script async defer
+
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlDn1p_hc7UfF1sfKEdHaz_0fnyJZIDk0&callback=myMap">
+
+	</script>
+</body>	
+{% endblock %}

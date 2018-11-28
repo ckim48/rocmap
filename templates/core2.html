@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="static/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicons/favicon-16x16.png">
+    <link rel="manifest" href="static/favicons/manifest.json">
+    <link rel="mask-icon" href="static/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://rocmap.net/static/css/simplebar.css">
+    <link rel="stylesheet" href="static/css/introjs.min.css">
+    <link rel="stylesheet" href="static/css/introjs-rtl.min.css">
+    <!--        <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script> -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://rocmap.net./static/js/simplebar.js"></script>
+    <script src="static/js/intro.min.js"></script>
+    <!--	<script type="text/javascript" src="../static/test.js"></script> Slim version was moved since it doesn't have all the features we need-->
+    <style>
+        .alert-full-page {
+            width: 50%;
+            position: fixed;
+            left: 50%;
+            margin-left: -25%;
+            z-index: 1051;
+        }
+        
+         ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: #f7f7f7;
+        }
+        
+         ::-webkit-scrollbar {
+            width: 12px;
+            background-color: #f7f7f7;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background-color: #E2E2E2;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Added common html element Seungho 2017-11-27-->
+    <div class="alert alert-success alert-full-page" id="alert-success" role="alert" style="display:none;"></div>
+    <div class="alert alert-danger alert-full-page" id="alert-fail" role="alert" style="display:none;"></div>
+    {% block body %} {% endblock %}
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!--    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> Removed since slimmed version doesnt support ajax-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    <!-- CDN of Jquery UI-->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <!-- END OF CDN of Jquery UI-->
+    <!-- CUSTOM JAVASCRIPT -->
+    <script>
+        //Added common html element Seungho 2017-11-27
+        $(document).ready(function() {
+            $('.alert-full-page').hide();
+        });
+
+        function showAlert(msg, success) {
+            if (success) {
+                $("#alert-success").html(msg);
+                $('#alert-success').fadeTo(2000, 500).slideUp(500, function() {
+                    $("#alert-success").slideUp(500);
+                });
+            } else {
+                $("#alert-fail").html(msg);
+                $('#alert-fail').fadeTo(2000, 500).slideUp(500, function() {
+                    $("#alert-fail").slideUp(500);
+                });
+            }
+
+        };
+
+    </script>
+
+
+    <!-- Include the mutliselect CSS and JS: -->
+    <script type="text/javascript" src="static/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="static/css/bootstrap-multiselect.css" type="text/css" />
+    <!-- END OF CUSTOM JAVASRIPT -->
+</body>
+<html>
